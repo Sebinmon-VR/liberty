@@ -3,248 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Management Center | Liberty Plus</title>
+    <title>Intelligent Command Center | Liberty Plus</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
         .bg-navy { background-color: #082866; }
         .text-navy { color: #082866; }
-        .bg-aqua { background-color: #40B8D5; }
-        .text-aqua { color: #40B8D5; }
         
         /* Custom Tooltips */
-        [data-tooltip] { position: relative; cursor: pointer; }
+        [data-tooltip] { position: relative; }
         [data-tooltip]:before {
             content: attr(data-tooltip);
-            position: absolute;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
-            padding: 8px 12px;
-            background: #082866;
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            white-space: nowrap;
-            border-radius: 8px;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(8, 40, 102, 0.2);
-            z-index: 100;
+            position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%) translateY(10px);
+            padding: 8px 12px; background: #082866; color: white; font-size: 10px; font-weight: 700;
+            text-transform: uppercase; white-space: nowrap; border-radius: 8px; opacity: 0;
+            pointer-events: none; transition: all 0.2s ease; z-index: 100;
         }
         [data-tooltip]:hover:before { opacity: 1; transform: translateX(-50%) translateY(0); }
 
         .tab-active { background-color: #082866; color: white; box-shadow: 0 10px 20px rgba(8, 40, 102, 0.1); }
-        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Toast Animation */
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast { animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
     </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen pb-20">
 
-<!-- Premium Top Navigation -->
-<nav class="sticky top-0 z-[100] bg-white border-b border-slate-100 px-8 py-4 flex justify-between items-center backdrop-blur-md bg-white/80">
+<!-- Notification Container -->
+<div id="toast-container" class="fixed top-24 right-8 z-[1000] flex flex-col gap-4 pointer-events-none"></div>
+
+<nav class="sticky top-0 z-[100] bg-white/80 border-b border-slate-100 px-8 py-4 flex justify-between items-center backdrop-blur-md">
     <div class="flex items-center gap-4">
-        <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center text-white shadow-lg shadow-navy/20">
-            <span class="material-symbols-outlined font-bold">diamond</span>
-        </div>
+        <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center text-white shadow-lg"><span class="material-symbols-outlined">monitoring</span></div>
         <div>
-            <h1 class="text-lg font-black text-navy uppercase tracking-tighter leading-none">Liberty Admin</h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Command Center v10</p>
+            <h1 class="text-lg font-black text-navy uppercase tracking-tighter leading-none">Liberty Live</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Intelligent Command v11</p>
         </div>
     </div>
     
-    <div class="flex items-center gap-6">
-        <div class="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-2xl">
-            <button onclick="switchTab('active')" id="btn-active" class="tab-active px-6 py-2 rounded-xl text-xs font-bold transition-all">Active</button>
-            <button onclick="switchTab('done')" id="btn-done" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Archived</button>
+    <div class="flex items-center gap-4">
+        <div class="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-2xl">
+            <button onclick="switchTab('active')" id="btn-active" class="tab-active px-6 py-2 rounded-xl text-xs font-bold transition-all">Queue</button>
+            <button onclick="switchTab('done')" id="btn-done" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Archive</button>
+            <button onclick="switchTab('canceled')" id="btn-canceled" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Canceled</button>
+            <button onclick="switchTab('analytics')" id="btn-analytics" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Analytics</button>
             <button onclick="switchTab('catalog')" id="btn-catalog" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Catalog</button>
             <button onclick="switchTab('system')" id="btn-system" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">System</button>
         </div>
-        <div class="h-8 w-[1px] bg-slate-200"></div>
-        <a href="{{ url_for('admin_logout') }}" data-tooltip="Sign Out Safely" class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">
-            <span class="material-symbols-outlined text-lg">logout</span>
-        </a>
+        <a href="{{ url_for('admin_logout') }}" class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><span class="material-symbols-outlined">logout</span></a>
     </div>
 </nav>
 
 <main class="max-w-7xl mx-auto p-8 lg:p-12">
-    
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-hover">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-navy/5 flex items-center justify-center text-navy">
-                    <span class="material-symbols-outlined">analytics</span>
-                </div>
-                <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Global</span>
-            </div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Orders</p>
-            <h3 class="text-3xl font-black text-navy">{{ stats.total }}</h3>
+    <!-- Live Stats Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-12">
+        <div onclick="switchTab('active')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p>
+            <h3 id="stat-total" class="text-2xl font-black text-navy">{{ stats.total }}</h3>
         </div>
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-hover">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500">
-                    <span class="material-symbols-outlined">hourglass_empty</span>
-                </div>
-                <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Pending</span>
-            </div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Awaiting Wash</p>
-            <h3 class="text-3xl font-black text-navy">{{ stats.pending }}</h3>
+        <div onclick="switchTab('active')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Pending</p>
+            <h3 id="stat-pending" class="text-2xl font-black text-orange-500">{{ stats.pending }}</h3>
         </div>
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-hover">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-500">
-                    <span class="material-symbols-outlined">check_circle</span>
-                </div>
-                <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Completed</span>
-            </div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Finished Jobs</p>
-            <h3 class="text-3xl font-black text-navy">{{ stats.done }}</h3>
+        <div onclick="switchTab('done')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Completed</p>
+            <h3 id="stat-done" class="text-2xl font-black text-green-500">{{ stats.done }}</h3>
         </div>
-        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-hover">
-            <div class="flex justify-between items-start mb-4">
-                <div class="w-12 h-12 rounded-2xl bg-aqua/10 flex items-center justify-center text-aqua">
-                    <span class="material-symbols-outlined">account_balance_wallet</span>
-                </div>
-                <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Finance</span>
-            </div>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Revenue</p>
-            <h3 class="text-3xl font-black text-navy">AED {{ stats.revenue }}</h3>
+        <div onclick="switchTab('canceled')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Canceled</p>
+            <h3 id="stat-canceled" class="text-2xl font-black text-red-400">{{ stats.canceled }}</h3>
+        </div>
+        <div onclick="switchTab('analytics')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm col-span-2 lg:col-span-1 cursor-pointer hover:border-navy transition-all">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Revenue</p>
+            <h3 id="stat-revenue" class="text-2xl font-black text-navy">AED {{ stats.revenue }}</h3>
         </div>
     </div>
 
-    <!-- Active Bookings View -->
+    <!-- Analytics View -->
+    <div id="tab-analytics" class="content-section hidden space-y-8 animate-in fade-in duration-500">
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                <h3 class="text-sm font-black text-navy uppercase mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-sm">trending_up</span> Revenue Trend (Last 7 Days)</h3>
+                <div class="h-64"><canvas id="revenueChart"></canvas></div>
+            </div>
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                <h3 class="text-sm font-black text-navy uppercase mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-sm">pie_chart</span> Vehicle Mix</h3>
+                <div class="h-64"><canvas id="vehicleChart"></canvas></div>
+            </div>
+        </div>
+        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <h3 class="text-sm font-black text-navy uppercase mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-sm">bar_chart</span> Service Performance</h3>
+            <div class="h-80"><canvas id="serviceChart"></canvas></div>
+        </div>
+    </div>
+
+    <!-- Active Queue View -->
     <div id="tab-active" class="content-section space-y-6">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-black text-navy uppercase tracking-tighter">Active Queue</h2>
-            <button onclick="openBookingModal()" class="bg-navy text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aqua hover:text-navy transition-all shadow-xl shadow-navy/20 flex items-center gap-2">
-                <span class="material-symbols-outlined text-sm">add_circle</span> New Reservation
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-black text-navy uppercase tracking-tighter">Live Queue</h2>
+            <button onclick="openBookingModal()" class="bg-navy text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg flex items-center gap-2 transition-transform hover:scale-105">
+                <span class="material-symbols-outlined text-sm">add</span> New Reservation
             </button>
         </div>
-        
-        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-            <div class="overflow-x-auto no-scrollbar">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50/50 border-b border-slate-100">
-                            <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer</th>
-                            <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vehicle / Service</th>
-                            <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Appointment</th>
-                            <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pricing</th>
-                            <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-50">
-                        {% for b in bookings|selectattr("status", "equalto", "pending") %}
-                        <tr class="hover:bg-slate-50/30 transition-colors">
-                            <td class="px-8 py-6">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-navy font-bold text-xs">{{ b.fullName[:1] }}</div>
-                                    <div>
-                                        <p class="font-bold text-navy text-sm">{{ b.fullName }}</p>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase">{{ b.phone }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-6">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-slate-300 text-lg">commute</span>
-                                    <div>
-                                        <p class="text-[11px] font-black text-navy uppercase">{{ b.vehicleType }}</p>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{{ b.serviceType }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-6">
-                                <div class="flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-slate-300 text-lg">event</span>
-                                    <div>
-                                        <p class="text-[11px] font-black text-navy uppercase">{{ b.preferredDate }}</p>
-                                        <p class="text-[10px] text-aqua font-bold uppercase">{{ b.preferredTime }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-6">
-                                <span class="bg-aqua/10 text-aqua px-4 py-1 rounded-lg text-[11px] font-extrabold">AED {{ b.totalCost }}</span>
-                            </td>
-                            <td class="px-8 py-6 text-right">
-                                <div class="flex justify-end gap-2">
-                                    <button onclick="markStatus('{{ b.id }}', 'done')" data-tooltip="Mark as Done" class="w-10 h-10 rounded-xl bg-green-50 text-green-500 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center">
-                                        <span class="material-symbols-outlined text-lg">check</span>
-                                    </button>
-                                    <button onclick="deleteBooking('{{ b.id }}')" data-tooltip="Cancel Order" class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
-                                        <span class="material-symbols-outlined text-lg">close</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden"><div id="active-table-container"></div></div>
     </div>
 
-    <!-- Done Bookings View -->
+    <!-- Canceled View -->
+    <div id="tab-canceled" class="content-section hidden space-y-6">
+        <h2 class="text-2xl font-black text-navy uppercase tracking-tighter mb-6">Order History (Canceled)</h2>
+        <div id="canceled-table-container" class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden"></div>
+    </div>
+
+    <!-- Done View -->
     <div id="tab-done" class="content-section hidden space-y-6">
-        <h2 class="text-3xl font-black text-navy uppercase tracking-tighter mb-8">System Archive</h2>
-        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
-             <div class="overflow-x-auto no-scrollbar">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-slate-50/50 border-b border-slate-100">
-                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Completion Log</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vehicle</th>
-                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date Finish</th>
-                            <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-50">
-                        {% for b in bookings|selectattr("status", "equalto", "done") %}
-                        <tr class="opacity-70 hover:opacity-100 transition-opacity">
-                            <td class="px-8 py-5 font-bold text-navy text-sm">{{ b.fullName }}</td>
-                            <td class="px-6 py-5 uppercase text-[10px] font-black text-slate-400">{{ b.vehicleType }}</td>
-                            <td class="px-6 py-5 uppercase text-[10px] font-black text-slate-400">{{ b.preferredDate }}</td>
-                            <td class="px-8 py-5 text-right font-black text-green-500">AED {{ b.totalCost }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-             </div>
-        </div>
+        <h2 class="text-2xl font-black text-navy uppercase tracking-tighter mb-6">Order Archive (Done)</h2>
+        <div id="done-table-container" class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden"></div>
     </div>
 
     <!-- Catalog View -->
-    <div id="tab-catalog" class="content-section hidden space-y-10">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-3xl font-black text-navy uppercase tracking-tighter">Service Catalog</h2>
-            <button onclick="openServiceModal()" class="bg-aqua text-navy px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-navy hover:text-white transition-all">
-                Add Vehicle Type
-            </button>
+    <div id="tab-catalog" class="content-section hidden space-y-8">
+         <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-black text-navy uppercase tracking-tighter">Service Catalog</h2>
+            <button onclick="openServiceModal()" class="bg-slate-100 text-navy px-6 py-3 rounded-xl font-bold text-[10px] uppercase">Add Vehicle</button>
         </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-3 gap-6">
             {% for s in services %}
-            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 card-hover relative group">
-                <div class="flex justify-between items-center mb-6">
-                    <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-aqua group-hover:text-navy transition-all">
-                        <span class="material-symbols-outlined">directions_car</span>
-                    </div>
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100">
+                <div class="flex justify-between items-start mb-6">
+                    <h4 class="text-lg font-black text-navy uppercase tracking-tighter leading-tight">{{ s.vehicleType }}</h4>
                     <div class="flex gap-2">
-                        <button onclick='editService(JSON.parse(this.dataset.service))' data-service='{{ s|tojson|safe }}' data-tooltip="Update Specs" class="text-slate-300 hover:text-navy transition-colors"><span class="material-symbols-outlined text-lg">edit_note</span></button>
-                        <button onclick="deleteService('{{ s.id }}')" data-tooltip="Remove Category" class="text-slate-300 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-lg">delete_sweep</span></button>
+                        <button onclick='editService(JSON.parse(this.dataset.service))' data-service='{{ s|tojson|safe }}' class="text-slate-300 hover:text-navy transition-colors"><span class="material-symbols-outlined text-sm">edit</span></button>
+                        <button onclick="deleteService('{{ s.id }}')" class="text-slate-300 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-sm">delete</span></button>
                     </div>
                 </div>
-                <h4 class="text-xl font-black text-navy uppercase mb-6 tracking-tighter">{{ s.vehicleType }}</h4>
-                <div class="space-y-4">
+                <div class="space-y-3">
                     {% for item in s.services %}
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ item.name }}</span>
-                        <span class="text-xs font-black text-navy">AED {{ item.price }}</span>
+                    <div class="flex justify-between items-center text-[11px] font-bold text-slate-400">
+                        <span class="uppercase tracking-widest">{{ item.name }}</span>
+                        <span class="text-navy font-black">AED {{ item.price }}</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -256,12 +157,9 @@
     <!-- System View -->
     <div id="tab-system" class="content-section hidden grid lg:grid-cols-2 gap-12">
         <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-xl font-black text-navy uppercase">Business Hours</h2>
-                <button onclick="addTimingRow()" class="text-aqua text-[10px] font-black uppercase flex items-center gap-1"><span class="material-symbols-outlined text-sm">add</span> Slot</button>
-            </div>
+            <h2 class="text-xl font-black text-navy uppercase mb-8">Business Timings</h2>
             <form id="timings-form" class="space-y-6">
-                <div id="timing-rows" class="grid grid-cols-2 gap-4 max-h-60 overflow-y-auto no-scrollbar pr-2">
+                <div id="timing-rows" class="grid grid-cols-2 gap-4 max-h-60 overflow-y-auto no-scrollbar">
                     {% for t in timings %}
                     <div class="flex gap-2 items-center bg-slate-50 p-2 rounded-xl">
                         <input type="text" value="{{ t }}" required class="flex-1 bg-transparent border-none font-bold text-navy text-xs uppercase">
@@ -269,165 +167,258 @@
                     </div>
                     {% endfor %}
                 </div>
-                <button type="submit" class="w-full py-5 rounded-full bg-navy text-white font-black uppercase text-xs tracking-widest hover:bg-aqua hover:text-navy transition-all shadow-lg">Restore Schedule</button>
+                <button type="submit" class="w-full py-4 rounded-xl bg-navy text-white font-black uppercase text-[10px] tracking-widest">Update Schedule</button>
             </form>
         </div>
         <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
-            <h2 class="text-xl font-black text-navy uppercase mb-8">Security & Access</h2>
-            <div class="space-y-4 mb-10 max-h-60 overflow-y-auto no-scrollbar">
+            <h2 class="text-xl font-black text-navy uppercase mb-8">User Directory</h2>
+            <div class="space-y-4 mb-8">
                 {% for admin in admins %}
-                <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl">
-                    <div class="flex items-center gap-3">
-                        <span class="material-symbols-outlined text-slate-200">shield_person</span>
-                        <span class="font-bold text-navy">{{ admin.username }}</span>
-                    </div>
-                    <div class="flex gap-4">
-                        <button onclick='editAdmin(JSON.parse(this.dataset.admin))' data-admin='{{ admin|tojson|safe }}' data-tooltip="Reset Pass" class="text-slate-300 hover:text-navy transition-colors"><span class="material-symbols-outlined text-lg">admin_panel_settings</span></button>
-                        <button onclick="deleteAdmin('{{ admin.id }}')" data-tooltip="Revoke Key" class="text-slate-300 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-lg">person_remove</span></button>
-                    </div>
+                <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">
+                    <span class="font-bold text-navy text-sm">{{ admin.username }}</span>
+                    <button onclick='editAdmin(JSON.parse(this.dataset.admin))' data-admin='{{ admin|tojson|safe }}' class="text-slate-300 hover:text-navy"><span class="material-symbols-outlined text-sm">edit</span></button>
                 </div>
                 {% endfor %}
             </div>
-            <button onclick="openAdminModal()" class="w-full py-5 rounded-full bg-slate-900 text-white font-black uppercase text-xs tracking-widest hover:bg-navy shadow-xl">Issue New Key</button>
+            <button onclick="openAdminModal()" class="w-full py-4 rounded-xl bg-slate-100 text-navy font-black uppercase text-[10px] tracking-widest">+ New Administrator</button>
         </div>
     </div>
 </main>
 
-<!-- Unified Modals Reskinned -->
-<div id="overlay" class="fixed inset-0 bg-[#082866]/90 backdrop-blur-xl z-[200] hidden flex items-center justify-center p-6" onclick="closeAllModals()">
-    <!-- New Booking Modal -->
-    <div id="booking-modal" class="bg-white w-full max-w-3xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
-        <h3 class="text-3xl font-black text-navy uppercase tracking-tighter mb-10">Manual Reservation</h3>
+<!-- Modals Overlay -->
+<div id="overlay" class="fixed inset-0 bg-navy/90 backdrop-blur-xl z-[200] hidden flex items-center justify-center p-6" onclick="closeAllModals()">
+    
+    <!-- Manual Booking Modal -->
+    <div id="booking-modal" class="bg-white w-full max-w-xl rounded-[3rem] p-12 hidden" onclick="event.stopPropagation()">
+        <h3 class="text-2xl font-black text-navy uppercase mb-8">Manual Entry</h3>
         <form id="admin-booking-form" class="space-y-6">
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Client Name</label><input type="text" id="mb-name" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></div>
-                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Primary Phone</label><input type="tel" id="mb-phone" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></div>
+            <input type="text" id="mb-name" required placeholder="User Name" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+            <input type="tel" id="mb-phone" required placeholder="Phone" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+            <div class="grid grid-cols-2 gap-4">
+                <select id="mb-vehicle" required class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy"></select>
+                <select id="mb-service" required class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy"></select>
             </div>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Vehicle Category</label><select id="mb-vehicle" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></select></div>
-                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Requested Service</label><select id="mb-service" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></select></div>
+            <div class="grid grid-cols-2 gap-4">
+                <input type="date" id="mb-date" required class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                <select id="mb-time" required class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy"></select>
             </div>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Select Date</label><input type="date" id="mb-date" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></div>
-                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Target Slot</label><select id="mb-time" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></select></div>
-            </div>
-            <div class="flex justify-between items-center pt-8 border-t border-slate-50">
-                <div id="mb-price" class="text-4xl font-black text-navy">AED 0.00</div>
-                <button type="submit" class="bg-aqua text-navy px-12 py-5 rounded-full font-black uppercase text-xs tracking-widest shadow-xl shadow-aqua/20">Authorize Booking</button>
+            <div class="flex justify-between items-center pt-6">
+                <div id="mb-price" class="text-3xl font-black text-navy tracking-tighter">AED 0.00</div>
+                <button type="submit" class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Authorize</button>
             </div>
         </form>
     </div>
 
-    <!-- Service Catalog Modal -->
-    <div id="service-modal" class="bg-white w-full max-w-xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+    <!-- Booking Details Modal -->
+    <div id="details-modal" class="bg-white w-full max-w-xl rounded-[4rem] p-16 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-start mb-10">
+            <div>
+                <p id="det-status" class="text-[9px] font-black text-aqua uppercase tracking-widest mb-2">Pending Order</p>
+                <h3 id="det-name" class="text-4xl font-black text-navy uppercase tracking-tighter">Customer Name</h3>
+            </div>
+            <button onclick="closeAllModals()" class="text-slate-300 hover:text-red-500"><span class="material-symbols-outlined text-3xl">cancel</span></button>
+        </div>
+        <div class="grid grid-cols-2 gap-10">
+            <div class="space-y-6">
+                <div><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Email Profile</p><p id="det-email" class="font-bold text-navy">customer@example.com</p></div>
+                <div><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Mobile Contact</p><p id="det-phone" class="font-bold text-navy">+971 -- --- ----</p></div>
+                <div><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Residence Address</p><p id="det-address" class="font-bold text-navy italic">On-Site Booking</p></div>
+            </div>
+            <div class="space-y-6">
+                <div><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Selected Program</p><p id="det-service" class="font-bold text-aqua uppercase">Express Wash</p></div>
+                <div><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Schedule Slot</p><p id="det-time" class="font-bold text-navy uppercase">10:00 AM - 11:00 AM</p><p id="det-date" class="text-[10px] font-bold text-slate-400">2026-03-28</p></div>
+                <div><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Fee</p><p id="det-price" class="text-2xl font-black text-navy">AED 00.00</p></div>
+            </div>
+        </div>
+    </div>
+
+     <div id="service-modal" class="bg-white w-full max-w-lg rounded-[3rem] p-10 hidden" onclick="event.stopPropagation()">
         <h3 class="text-2xl font-black text-navy uppercase mb-8">Catalog Specification</h3>
         <form id="service-form" class="space-y-6">
-            <input type="hidden" id="service-id"><input type="text" id="v-name" required placeholder="Vehicle Class Name" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy">
-            <div id="service-rows" class="space-y-3 max-h-48 overflow-y-auto pr-2 no-scrollbar"></div>
-            <button onclick="addServiceRow()" type="button" class="w-full py-4 border-2 border-dashed border-slate-100 rounded-2xl text-[9px] font-black uppercase">+ New Entry Row</button>
-            <button type="submit" class="w-full py-5 rounded-full bg-navy text-white font-black uppercase text-xs tracking-widest">Update Specs</button>
+            <input type="hidden" id="service-id"><input type="text" id="v-name" required placeholder="Vehicle Class Name" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+            <div id="service-rows" class="space-y-3"></div>
+            <button onclick="addServiceRow()" type="button" class="w-full py-3 border-2 border-dashed border-slate-100 rounded-xl text-[9px] font-black uppercase">+ Add Row</button>
+            <button type="submit" class="w-full py-4 rounded-xl bg-navy text-white font-black uppercase text-[10px] tracking-widest">Update Specs</button>
         </form>
     </div>
-
-    <!-- Security Modal -->
-    <div id="admin-modal" class="bg-white w-full max-w-md rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+    <div id="admin-modal" class="bg-white w-full max-sm rounded-[3rem] p-10 hidden" onclick="event.stopPropagation()">
         <h3 class="text-2xl font-black text-navy uppercase mb-8">Access Profile</h3>
         <form id="admin-form" class="space-y-6">
-            <input type="hidden" id="admin-id"><input type="text" id="a-user" required placeholder="Security Identity" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy">
-            <input type="text" id="a-pass" required placeholder="Pass Authorization" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy">
-            <button type="submit" class="w-full py-5 rounded-full bg-navy text-white font-black uppercase text-xs tracking-widest">Update Access</button>
+            <input type="hidden" id="admin-id"><input type="text" id="a-user" required placeholder="User ID" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+            <input type="text" id="a-pass" required placeholder="Assign Passphrase" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+            <button type="submit" class="w-full py-4 rounded-xl bg-navy text-white font-black uppercase text-9px tracking-widest">Save Authorization</button>
         </form>
     </div>
 </div>
 
-<!-- Data Stores -->
 <div id="services-data" class="hidden" data-services='{{ services|tojson|safe }}'></div>
 <div id="timings-data" class="hidden" data-timings='{{ timings|tojson|safe }}'></div>
 
 <script>
     const servicesData = JSON.parse(document.getElementById('services-data').dataset.services);
     const timingsData = JSON.parse(document.getElementById('timings-data').dataset.timings);
+    let allBookings = [];
+    let knownBookingIds = new Set();
+    let charts = {};
+    let currentTab = 'active';
 
     function switchTab(tab) {
+        currentTab = tab;
         document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('nav button').forEach(el => el.classList.remove('tab-active'));
         document.getElementById(`tab-${tab}`).classList.remove('hidden');
         document.getElementById(`btn-${tab}`).classList.add('tab-active');
+        if(tab === 'analytics') initCharts();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function syncData() {
+        try {
+            const res = await fetch('/api/admin/dashboard/data');
+            const data = await res.json();
+            const s = data.stats;
+            document.getElementById('stat-total').innerText = s.total;
+            document.getElementById('stat-pending').innerText = s.pending;
+            document.getElementById('stat-done').innerText = s.done;
+            document.getElementById('stat-canceled').innerText = s.canceled;
+            document.getElementById('stat-revenue').innerText = 'AED ' + s.revenue;
+            const newBookings = data.bookings.filter(b => !knownBookingIds.has(b.id));
+            if(knownBookingIds.size > 0 && newBookings.length > 0) newBookings.forEach(showToast);
+            newBookings.forEach(b => knownBookingIds.add(b.id));
+            allBookings = data.bookings;
+            renderTables();
+            if(currentTab === 'analytics') initCharts();
+        } catch(e) { console.error('Sync error:', e); }
+    }
+
+    function showToast(b) {
+        const t = document.createElement('div');
+        t.className = "toast bg-white p-6 rounded-2xl shadow-xl border-l-4 border-aqua flex gap-4 items-center pointer-events-auto w-80";
+        t.innerHTML = `<div class="w-10 h-10 rounded-full bg-aqua/10 flex items-center justify-center text-aqua"><span class="material-symbols-outlined">notifications_active</span></div><div><p class="text-xs font-black text-navy uppercase">New Booking!</p><p class="text-[10px] font-bold text-slate-500">${b.fullName}</p></div>`;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 5000);
+    }
+
+    function renderTables() {
+        const render = (list, target) => {
+            const container = document.getElementById(target);
+            if(!list.length) { container.innerHTML = '<div class="p-12 text-center text-slate-300 font-bold uppercase text-[10px]">No records found</div>'; return; }
+            container.innerHTML = `
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50/50 border-b border-slate-100">
+                        <tr>
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Detail</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Price</th>
+                            <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        ${list.map(b => `
+                            <tr class="hover:bg-slate-50/30 transition-colors">
+                                <td class="px-8 py-5" onclick="showBookingDetails('${b.id}')" style="cursor:zoom-in">
+                                    <p class="font-bold text-navy text-sm">${b.fullName}</p>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase">${b.preferredDate} @ ${b.preferredTime}</p>
+                                </td>
+                                <td class="px-6 py-5 uppercase text-[10px] font-black text-slate-400">${b.vehicleType}</td>
+                                <td class="px-6 py-5"><span class="bg-aqua/10 text-aqua px-3 py-1 rounded-lg text-[10px] font-bold">AED ${b.totalCost}</span></td>
+                                <td class="px-8 py-5 text-right flex justify-end gap-2">
+                                    <button onclick="showBookingDetails('${b.id}')" data-tooltip="View Full Profile" class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-navy hover:text-white transition-all"><span class="material-symbols-outlined text-sm">visibility</span></button>
+                                    ${b.status === 'pending' ? `
+                                        <button onclick="markStatus('${b.id}', 'done')" data-tooltip="Finish" class="w-8 h-8 rounded-lg bg-green-50 text-green-500 flex items-center justify-center hover:bg-green-500 hover:text-white transition-all"><span class="material-symbols-outlined text-sm">check</span></button>
+                                        <button onclick="markStatus('${b.id}', 'canceled')" data-tooltip="Cancel" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"><span class="material-symbols-outlined text-sm">close</span></button>
+                                    ` : `<span class="text-[9px] font-black uppercase text-slate-300">${b.status}</span>`}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        };
+        render(allBookings.filter(b => b.status === 'pending'), 'active-table-container');
+        render(allBookings.filter(b => b.status === 'done'), 'done-table-container');
+        render(allBookings.filter(b => b.status === 'canceled'), 'canceled-table-container');
+    }
+
+    function showBookingDetails(id) {
+        const b = allBookings.find(x => x.id === id);
+        if(!b) return;
+        document.getElementById('det-status').innerText = b.status + ' order';
+        document.getElementById('det-name').innerText = b.fullName;
+        document.getElementById('det-email').innerText = b.email || 'No email provided';
+        document.getElementById('det-phone').innerText = b.phone;
+        document.getElementById('det-address').innerText = b.address || 'On-Site Booking at Liberty Plus';
+        document.getElementById('det-service').innerText = b.vehicleType + ' / ' + b.serviceType;
+        document.getElementById('det-time').innerText = b.preferredTime;
+        document.getElementById('det-date').innerText = b.preferredDate;
+        document.getElementById('det-price').innerText = 'AED ' + b.totalCost;
+        overlay.classList.remove('hidden');
+        document.getElementById('details-modal').classList.remove('hidden');
+    }
+
+    function initCharts() {
+        const ctxRev = document.getElementById('revenueChart').getContext('2d');
+        const ctxVeh = document.getElementById('vehicleChart').getContext('2d');
+        const ctxSer = document.getElementById('serviceChart').getContext('2d');
+        if(charts.revenue) { charts.revenue.destroy(); charts.vehicle.destroy(); charts.service.destroy(); }
+        const last7Days = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0]; }).reverse();
+        const revData = last7Days.map(date => { return allBookings.filter(b => b.status === 'done' && b.preferredDate === date).reduce((sum, b) => sum + parseFloat(b.totalCost || 0), 0); });
+        const vehDistribution = {}; allBookings.forEach(b => vehDistribution[b.vehicleType] = (vehDistribution[b.vehicleType] || 0) + 1);
+        const serDistribution = {}; allBookings.forEach(b => serDistribution[b.serviceType] = (serDistribution[b.serviceType] || 0) + 1);
+        charts.revenue = new Chart(ctxRev, { type: 'line', data: { labels: last7Days, datasets: [{ label: 'Revenue', data: revData, borderColor: '#40B8D5', backgroundColor: 'rgba(64, 184, 213, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+        charts.vehicle = new Chart(ctxVeh, { type: 'doughnut', data: { labels: Object.keys(vehDistribution), datasets: [{ data: Object.values(vehDistribution), backgroundColor: ['#082866', '#40B8D5', '#CBD5E1', '#F1F5F9', '#1E293B'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } } } } });
+        charts.service = new Chart(ctxSer, { type: 'bar', data: { labels: Object.keys(serDistribution), datasets: [{ label: 'Orders', data: Object.values(serDistribution), backgroundColor: '#082866', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
     }
 
     async function markStatus(id, status) {
-        if (!confirm('Mark job as officially completed?')) return;
+        if (!confirm(`Mark as ${status}?`)) return;
         const res = await fetch(`/api/admin/bookings/${id}/status`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status})});
-        if (res.ok) location.reload();
-    }
-    
-    async function deleteBooking(id) {
-        if (!confirm('Permanently cancel this order?')) return;
-        const res = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE' });
-        if (res.ok) location.reload();
+        if (res.ok) syncData();
     }
 
     const overlay = document.getElementById('overlay');
     function closeAllModals() { 
         overlay.classList.add('hidden'); 
-        ['booking-modal', 'service-modal', 'admin-modal'].forEach(m => document.getElementById(m).classList.add('hidden'));
+        ['booking-modal', 'details-modal', 'service-modal', 'admin-modal'].forEach(m => document.getElementById(m).classList.add('hidden')); 
     }
-
-    function openBookingModal() {
+    function openBookingModal() { populateManualDropdowns(); overlay.classList.remove('hidden'); document.getElementById('booking-modal').classList.remove('hidden'); }
+    function populateManualDropdowns() {
         const vS = document.getElementById('mb-vehicle');
         const tS = document.getElementById('mb-time');
         vS.innerHTML = servicesData.map(s => `<option value="${s.vehicleType}">${s.vehicleType}</option>`).join('');
         tS.innerHTML = timingsData.map(t => `<option value="${t}">${t}</option>`).join('');
         updateManualPrice();
-        overlay.classList.remove('hidden');
-        document.getElementById('booking-modal').classList.remove('hidden');
     }
-
     document.getElementById('mb-vehicle').onchange = updateManualPrice;
     document.getElementById('mb-service').onchange = () => {
         const p = document.getElementById('mb-service').selectedOptions[0].dataset.price;
         document.getElementById('mb-price').textContent = `AED ${parseFloat(p).toFixed(2)}`;
     };
-
     function updateManualPrice() {
         const v = servicesData.find(s => s.vehicleType === document.getElementById('mb-vehicle').value);
         const sS = document.getElementById('mb-service');
         sS.innerHTML = v.services.map(s => `<option value="${s.name}" data-price="${s.price}">${s.name}</option>`).join('');
         document.getElementById('mb-price').textContent = `AED ${parseFloat(v.services[0].price).toFixed(2)}`;
     }
-
     document.getElementById('admin-booking-form').onsubmit = async (e) => {
         e.preventDefault();
-        const data = {
-            fullName: document.getElementById('mb-name').value,
-            phone: document.getElementById('mb-phone').value,
-            vehicleType: document.getElementById('mb-vehicle').value,
-            serviceType: document.getElementById('mb-service').value,
-            totalCost: parseFloat(document.getElementById('mb-service').selectedOptions[0].dataset.price),
-            preferredDate: document.getElementById('mb-date').value,
-            preferredTime: document.getElementById('mb-time').value,
-            bookingType: 'On-Site Entry'
-        };
+        const data = { fullName: document.getElementById('mb-name').value, phone: document.getElementById('mb-phone').value, vehicleType: document.getElementById('mb-vehicle').value, serviceType: document.getElementById('mb-service').value, totalCost: parseFloat(document.getElementById('mb-service').selectedOptions[0].dataset.price), preferredDate: document.getElementById('mb-date').value, preferredTime: document.getElementById('mb-time').value, bookingType: 'Manual Entry' };
         await fetch('/api/admin/bookings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
-        location.reload();
+        closeAllModals(); syncData();
     };
 
     function addServiceRow(n='', p='') {
-        const div = document.createElement('div');
-        div.className = 'flex gap-2 items-center bg-slate-50 p-2 rounded-xl';
-        div.innerHTML = `<input type="text" value="${n}" required placeholder="Service" class="flex-1 bg-transparent border-none font-bold text-navy text-[11px] uppercase"><input type="number" value="${p}" required placeholder="AED" class="w-16 bg-transparent border-none font-bold text-navy text-[11px] uppercase"><button type="button" onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500"><span class="material-symbols-outlined text-sm">close</span></button>`;
+        const div = document.createElement('div'); div.className = 'flex gap-2 items-center bg-slate-50 p-2 rounded-xl border border-slate-100 mb-2';
+        div.innerHTML = `<input type="text" value="${n}" required placeholder="Service" class="flex-1 bg-transparent border-none font-bold text-navy text-[10px] uppercase"><input type="number" value="${p}" required placeholder="AED" class="w-16 bg-transparent border-none font-bold text-navy text-[10px] uppercase"><button type="button" onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-sm">close</span></button>`;
         document.getElementById('service-rows').appendChild(div);
     }
-
     function editService(s) {
         document.getElementById('service-id').value = s.id;
         document.getElementById('v-name').value = s.vehicleType;
         document.getElementById('service-rows').innerHTML = '';
         s.services.forEach(item => addServiceRow(item.name, item.price));
-        overlay.classList.remove('hidden');
-        document.getElementById('service-modal').classList.remove('hidden');
+        overlay.classList.remove('hidden'); document.getElementById('service-modal').classList.remove('hidden');
     }
-
     document.getElementById('service-form').onsubmit = async (e) => {
         e.preventDefault();
         const services = Array.from(document.getElementById('service-rows').querySelectorAll('div')).map(row => {
@@ -436,30 +427,25 @@
         await fetch('/api/admin/services', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id: document.getElementById('service-id').value, vehicleType: document.getElementById('v-name').value, services})});
         location.reload();
     }
-
-    function addTimingRow() {
-        const div = document.createElement('div');
-        div.className = 'flex gap-2 items-center bg-slate-50 p-2 rounded-xl';
-        div.innerHTML = `<input type="text" placeholder="Shift Label" required class="flex-1 bg-transparent border-none font-bold text-navy text-[10px] uppercase"><button type="button" onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500"><span class="material-symbols-outlined text-sm">remove</span></button>`;
-        document.getElementById('timing-rows').appendChild(div);
-    }
     document.getElementById('timings-form').onsubmit = async (e) => {
         e.preventDefault();
         const slots = Array.from(document.getElementById('timing-rows').querySelectorAll('input')).map(i => i.value);
         await fetch('/api/admin/settings/timings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({slots})});
         location.reload();
     };
-
     function openAdminModal() { overlay.classList.remove('hidden'); document.getElementById('admin-modal').classList.remove('hidden'); }
     function editAdmin(a) { document.getElementById('admin-id').value = a.id; document.getElementById('a-user').value = a.username; document.getElementById('a-pass').value = a.password; openAdminModal(); }
-    document.getElementById('admin-form').onsubmit = async (e) => {
-        e.preventDefault();
-        await fetch('/api/admin/admins', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id: document.getElementById('admin-id').value, username: document.getElementById('a-user').value, password: document.getElementById('a-pass').value})});
-        location.reload();
-    };
+    document.getElementById('admin-form').onsubmit = async (e) => { e.preventDefault(); await fetch('/api/admin/admins', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id: document.getElementById('admin-id').value, username: document.getElementById('a-user').value, password: document.getElementById('a-pass').value})}); location.reload(); };
+    async function deleteService(id) { if(confirm('Delete?')) { await fetch(`/api/admin/services/${id}`, {method:'DELETE'}); location.reload(); } }
 
-    async function deleteService(id) { if(confirm('Permanently remove vehicle class?')) { await fetch(`/api/admin/services/${id}`, {method:'DELETE'}); location.reload(); } }
-    async function deleteAdmin(id) { if(confirm('Delete administrator key?')) { await fetch(`/api/admin/admins/${id}`, {method:'DELETE'}); location.reload(); } }
+    window.onload = () => {
+        {% for b in bookings %}
+        knownBookingIds.add('{{ b.id }}');
+        {% endfor %}
+        allBookings = {{ bookings|tojson|safe }};
+        renderTables();
+        setInterval(syncData, 15000); // Poll every 15s
+    };
 </script>
 
 </body>

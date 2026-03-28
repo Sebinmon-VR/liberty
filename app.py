@@ -111,7 +111,18 @@ def admin_dashboard():
         timing_item = list(settings_container.query_items(query="SELECT * FROM c WHERE c.id = 'timings'", enable_cross_partition_query=True))
         timings = timing_item[0]['slots'] if timing_item else []
         
-        stats = {"total": len(bookings), "pending": len([b for b in bookings if b.get('status') == 'pending']), "done": len([b for b in bookings if b.get('status') == 'done']), "revenue": sum([float(b.get('totalCost', 0)) for b in bookings if b.get('status') == 'done'])}
+        counts = {
+            "pending": len([b for b in bookings if b.get('status') == 'pending']),
+            "done": len([b for b in bookings if b.get('status') == 'done']),
+            "canceled": len([b for b in bookings if b.get('status') == 'canceled']),
+        }
+        stats = {
+            "total": counts["pending"] + counts["done"] + counts["canceled"],
+            "pending": counts["pending"],
+            "done": counts["done"],
+            "canceled": counts["canceled"],
+            "revenue": sum([float(b.get('totalCost', 0)) for b in bookings if b.get('status') == 'done'])
+        }
         return render_template('admin.html', bookings=bookings, services=services, admins=admins, timings=timings, stats=stats)
     except Exception as e:
         flash(f"Error fetching data: {e}", 'error')
@@ -128,6 +139,37 @@ def update_booking_status(id):
             item['status'], item['updatedAt'] = status, datetime.utcnow().isoformat()
             bookings_container.upsert_item(body=item)
             return jsonify({"message": f"Booking marked as {status}"}), 200
+        return jsonify({"error": "Not found"}), 404
+    except Exception as e: return jsonify({"error": str(e)}), 500
+
+@app.route('/api/admin/dashboard/data', methods=['GET'])
+def get_dashboard_data():
+    if not session.get('admin_logged_in'): return jsonify({"error": "Unauthorized"}), 401
+    try:
+        bookings = list(bookings_container.query_items(query="SELECT * FROM c ORDER BY c.createdAt DESC", enable_cross_partition_query=True))
+        counts = {
+            "pending": len([b for b in bookings if b.get('status') == 'pending']),
+            "done": len([b for b in bookings if b.get('status') == 'done']),
+            "canceled": len([b for b in bookings if b.get('status') == 'canceled']),
+        }
+        stats = {
+            "total": counts["pending"] + counts["done"] + counts["canceled"],
+            "pending": counts["pending"],
+            "done": counts["done"],
+            "canceled": counts["canceled"],
+            "revenue": sum([float(b.get('totalCost', 0)) for b in bookings if b.get('status') == 'done'])
+        }
+        return jsonify({"bookings": bookings, "stats": stats})
+    except Exception as e: return jsonify({"error": str(e)}), 500
+
+@app.route('/api/admin/bookings/<id>', methods=['DELETE'])
+def delete_booking(id):
+    if not session.get('admin_logged_in'): return jsonify({"error": "Unauthorized"}), 401
+    try:
+        items = list(bookings_container.query_items(query=f"SELECT * FROM c WHERE c.id = '{id}'", enable_cross_partition_query=True))
+        if items:
+            bookings_container.delete_item(item=id, partition_key=items[0].get('_partitionKey'))
+            return jsonify({"message": "Booking deleted"}), 200
         return jsonify({"error": "Not found"}), 404
     except Exception as e: return jsonify({"error": str(e)}), 500
 
