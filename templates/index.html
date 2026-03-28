@@ -355,94 +355,67 @@
                             Home Booking
                         </button>
 </div>
-<form class="space-y-6">
-<div class="grid gap-6 md:grid-cols-2">
-<div class="space-y-2">
-<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Full Name</label>
-<input class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none" placeholder="John Doe" type="text"/>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Contact Number</label>
-<input class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none" placeholder="+1 (555) 000-0000" type="tel"/>
-</div>
-<div class="space-y-2 col-span-full hidden opacity-0 transition-all duration-300" id="home-address-container">
-<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Home Address</label>
-<input class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none" placeholder="Enter your full address for home service" type="text"/>
-</div>
-</div>
-<div class="grid md:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Vehicle Type</label>
-<select class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none"><option>Small Car Sedan Type</option>
-<option>Hatchback Type 5 Seater</option>
-<option>4x4 Wheel Type Car 7 Seater</option>
-<option>Pick Up Small Car</option>
-<option>Pick Up 4x4 Wheel Big Pick Up</option>
-<option>9 Seater Van</option>
-<option>14 Seater Van</option>
-<option>22 Seater Coaster Bus</option>
-<option>32 Seater Coaster Bus</option>
-<option>Recovery Type Vehicle</option>
-<option>3 Ton Pick Up (Without Cabin)</option>
-<option>3 Ton Pick Up (With Cabin)</option>
-<option>7 Ton Pick Up Type</option>
-<option>Big Bus 60 Above Seater</option>
-<option>Trolly Wash</option>
-<option>Bike Wash</option></select>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">SERVICE TYPE</label>
-<select class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none">
-<option>Full Wash</option>
-<option>Body Wash</option>
-<option>Water Wash</option>
-<option>Oil Change Only</option>
-<option>Oil &amp; Filter Change</option>
-<option>Grease Change</option>
-</select>
-</div>
-</div>
-<div class="grid md:grid-cols-2 gap-6">
-<div class="space-y-2">
-<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Preferred Date</label>
-<input class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none" type="date"/>
-</div>
-<div class="space-y-2">
-<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Preferred Time</label>
-<select class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none">
-<option value="07:00">07:00 AM</option>
-<option value="08:00">08:00 AM</option>
-<option value="09:00">09:00 AM</option>
-<option value="10:00">10:00 AM</option>
-<option value="11:00">11:00 AM</option>
-<option value="12:00">12:00 PM</option>
-<option value="13:00">01:00 PM</option>
-<option value="14:00">02:00 PM</option>
-<option value="15:00">03:00 PM</option>
-<option value="16:00">04:00 PM</option>
-<option value="17:00">05:00 PM</option>
-<option value="18:00">06:00 PM</option>
-<option value="19:00">07:00 PM</option>
-<option value="20:00">08:00 PM</option>
-<option value="21:00">09:00 PM</option>
-<option value="22:00">10:00 PM</option>
-<option value="23:00">11:00 PM</option>
-</select>
-</div>
-</div>
-<div class="pt-4 pb-2 border-t border-slate-100 mt-4">
-<div class="flex justify-between items-center">
-<span class="text-slate-500 font-bold uppercase tracking-wider text-xs">Estimated Price</span>
-<div class="text-right">
-<span class="text-brand-navy font-headline font-extrabold text-2xl uppercase">Total Cost: </span>
-<span class="text-brand-aqua font-headline font-extrabold text-2xl">AED 21</span>
-</div>
-</div>
-</div>
-<button class="w-full py-5 rounded-full bg-brand-aqua text-brand-navy font-headline font-extrabold text-lg hover:bg-brand-navy hover:text-white transition-all shadow-xl shadow-brand-aqua/20 active:scale-95 mt-4" type="submit">
-                            Confirm Booking
-                        </button>
-</form>
+            <form id="public-booking-form" class="space-y-6">
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1 font-headline">Full Name</label>
+                        <input id="f-name" class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none font-bold text-brand-navy" placeholder="John Doe" required type="text"/>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1 font-headline">Contact Number</label>
+                        <input id="f-phone" class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none font-bold text-brand-navy" placeholder="+971 -- --- ----" required type="tel"/>
+                    </div>
+                </div>
+                <div class="grid gap-6 md:grid-cols-2">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1 font-headline">Email Address</label>
+                        <input id="f-email" class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none font-bold text-brand-navy" placeholder="john@example.com" required type="email"/>
+                    </div>
+                    <!-- Home Address Container (Restored) -->
+                    <div id="home-address-container" class="space-y-2 hidden opacity-0 transition-all duration-300">
+                        <label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1 font-headline">Home Address</label>
+                        <input id="f-address" class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none font-bold text-brand-navy" placeholder="Enter your full building/villa address" type="text"/>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1 font-headline">Vehicle Type</label>
+                        <select id="v-type" required class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none font-bold text-brand-navy">
+                            <option value="">Select Vehicle</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1 font-headline">Service Selection</label>
+                        <select id="s-type" required class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none font-bold text-brand-navy">
+                            <option value="">First Select Vehicle</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1 font-headline">Preferred Date</label>
+                        <input id="f-date" class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none font-bold text-brand-navy" required type="date"/>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1 font-headline">Preferred Time</label>
+                        <select id="f-time" required class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none font-bold text-brand-navy">
+                            <option value="">Select Time</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-4 pb-2 border-t border-slate-100 mt-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 font-bold uppercase tracking-wider text-xs">Estimated Price</span>
+                        <div class="text-right">
+                            <span class="text-brand-navy font-headline font-extrabold text-2xl uppercase">Total: </span>
+                            <span id="f-price-display" class="text-brand-aqua font-headline font-extrabold text-2xl">AED 0.00</span>
+                        </div>
+                    </div>
+                </div>
+                <button id="f-submit-btn" disabled class="w-full py-5 rounded-full bg-brand-aqua text-brand-navy font-headline font-extrabold text-lg hover:bg-brand-navy hover:text-white transition-all shadow-xl shadow-brand-aqua/20 active:scale-95 mt-4 disabled:opacity-30 disabled:cursor-not-allowed" type="submit">
+                    Confirm Booking
+                </button>
+            </form>
 </div>
 </div>
 </section>
@@ -589,123 +562,93 @@
 
     // Backend Integration
     let servicesData = [];
-    const vehicleSelect = document.querySelectorAll('select')[0];
-    const serviceSelect = document.querySelectorAll('select')[1];
-    const totalCostDisplay = document.querySelector('.text-brand-aqua.font-extrabold.text-2xl');
-    const bookingForm = document.querySelector('form');
+    let timingsData = [];
+    
+    const vSelect = document.getElementById('v-type');
+    const sSelect = document.getElementById('s-type');
+    const tSelect = document.getElementById('f-time');
+    const priceDisplay = document.getElementById('f-price-display');
+    const bForm = document.getElementById('public-booking-form');
+    const submitBtn = document.getElementById('f-submit-btn');
 
-    const serviceLabelMap = {
-        "fullWash": "Full Wash",
-        "bodyWash": "Body Wash",
-        "waterWash": "Water Wash",
-        "oilChangeOnly": "Oil Change Only",
-        "oilAndFilterChange": "Oil & Filter Change",
-        "greaseChange": "Grease Change"
+    async function initClientSystem() {
+        try {
+            const [sRes, tRes] = await Promise.all([
+                fetch('/api/services'),
+                fetch('/api/settings/timings')
+            ]);
+            servicesData = await sRes.json();
+            timingsData = await tRes.json();
+            
+            if(vSelect) {
+                vSelect.innerHTML = '<option value="">Select Vehicle</option>' + 
+                    servicesData.map(s => `<option value="${s.vehicleType}">${s.vehicleType}</option>`).join('');
+            }
+            
+            if(tSelect) {
+                tSelect.innerHTML = '<option value="">Select Time</option>' + 
+                    timingsData.map(t => `<option value="${t}">${t}</option>`).join('');
+            }
+            
+            validateForm();
+        } catch (err) { console.error('Initialization Error:', err); }
+    }
+
+    function validateForm() {
+        const emailVal = document.getElementById('f-email').value;
+        const emailValid = emailVal.includes('@') && emailVal.includes('.');
+        const isValid = vSelect && vSelect.value && 
+                        sSelect && sSelect.value && 
+                        tSelect && tSelect.value && 
+                        document.getElementById('f-name').value && 
+                        document.getElementById('f-phone').value && 
+                        emailValid &&
+                        document.getElementById('f-date').value;
+        if(submitBtn) submitBtn.disabled = !isValid;
+    }
+
+    if(vSelect) vSelect.onchange = () => {
+        const v = servicesData.find(s => s.vehicleType === vSelect.value);
+        sSelect.innerHTML = '<option value="">Select Service</option>' + 
+            (v ? v.services.map(s => `<option value="${s.name}" data-price="${s.price}">${s.name}</option>`).join('') : '');
+        updatePriceDisplay();
     };
 
-    async function initBookingSystem() {
-        try {
-            const response = await fetch('/api/services');
-            servicesData = await response.json();
-            
-            if (servicesData.length > 0) {
-                // Populate Vehicles
-                vehicleSelect.innerHTML = '';
-                servicesData.forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.vehicleType;
-                    opt.textContent = s.vehicleType;
-                    vehicleSelect.appendChild(opt);
-                });
+    if(sSelect) sSelect.onchange = updatePriceDisplay;
 
-                // Populate Services for the first vehicle
-                updateServiceOptions();
-            }
-        } catch (err) {
-            console.error('Failed to load services:', err);
-        }
+    function updatePriceDisplay() {
+        const opt = sSelect.selectedOptions[0];
+        const p = (opt && opt.dataset.price) ? parseFloat(opt.dataset.price).toFixed(2) : '0.00';
+        if(priceDisplay) priceDisplay.textContent = `AED ${p}`;
+        validateForm();
     }
 
-    function updateServiceOptions() {
-        const vehicle = servicesData.find(s => s.vehicleType === vehicleSelect.value);
-        if (!vehicle) return;
+    if(bForm) bForm.oninput = validateForm;
 
-        // Save current selection if possible
-        const currentService = serviceSelect.value;
-        serviceSelect.innerHTML = '';
-        
-        // Find all numeric fields that are not id, vehicleType, etc.
-        Object.keys(vehicle).forEach(key => {
-            if (serviceLabelMap[key] && typeof vehicle[key] === 'number') {
-                const opt = document.createElement('option');
-                opt.value = key;
-                opt.textContent = serviceLabelMap[key];
-                serviceSelect.appendChild(opt);
-            }
-        });
-
-        // Restore selection if it still exists
-        if (Array.from(serviceSelect.options).some(o => o.value === currentService)) {
-            serviceSelect.value = currentService;
-        }
-        
-        updatePrice();
-    }
-
-    function updatePrice() {
-        const vehicle = servicesData.find(s => s.vehicleType === vehicleSelect.value);
-        if (!vehicle) return;
-
-        const serviceKey = serviceSelect.value;
-        const price = vehicle[serviceKey] || 0;
-        totalCostDisplay.textContent = `AED ${price.toFixed(2)}`;
-    }
-
-    vehicleSelect.addEventListener('change', updateServiceOptions);
-    serviceSelect.addEventListener('change', updatePrice);
-
-    bookingForm.addEventListener('submit', async (e) => {
+    if(bForm) bForm.onsubmit = async (e) => {
         e.preventDefault();
-        const submitBtn = bookingForm.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
+        const bookingType = document.getElementById('btn-home').classList.contains('bg-brand-navy') ? 'Home Booking' : 'On-Site Service';
+        const address = bookingType === 'Home Booking' ? document.getElementById('f-address').value : 'At Garage';
         
-        const formData = {
-            fullName: bookingForm.querySelectorAll('input[type="text"]')[0].value,
-            phone: bookingForm.querySelector('input[type="tel"]').value,
-            address: document.getElementById('home-address-container').classList.contains('hidden') ? 'On-Site' : bookingForm.querySelectorAll('input[type="text"]')[1].value,
-            vehicleType: vehicleSelect.value,
-            serviceType: serviceSelect.value,
-            preferredDate: bookingForm.querySelector('input[type="date"]').value,
-            preferredTime: bookingForm.querySelectorAll('select')[2].value,
-            totalCost: totalCostDisplay.textContent.replace('AED ', ''),
-            bookingType: document.getElementById('btn-home').classList.contains('bg-brand-navy') ? 'Home Booking' : 'On-Site'
+        const data = {
+            fullName: document.getElementById('f-name').value,
+            phone: document.getElementById('f-phone').value,
+            email: document.getElementById('f-email').value,
+            address: address,
+            vehicleType: vSelect.value,
+            serviceType: sSelect.value,
+            totalCost: parseFloat(sSelect.selectedOptions[0].dataset.price),
+            preferredDate: document.getElementById('f-date').value,
+            preferredTime: tSelect.value,
+            bookingType: bookingType
         };
 
-        try {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Processing...';
-            
-            const response = await fetch('/api/bookings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
-            });
-
-            if (response.ok) {
-                alert('Booking Confirmed! Our team will contact you shortly.');
-                bookingForm.reset();
-                initBookingSystem();
-            } else {
-                alert('Submission failed. Please try again.');
-            }
-        } catch (err) {
-            console.error('Booking error:', err);
-            alert('Connection error. Please check your internet.');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+        const res = await fetch('/api/bookings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
+        if (res.ok) {
+            alert('Booking Successful! We will contact you shortly.');
+            location.reload();
         }
-    });
+    };
 
-    initBookingSystem();
+    initClientSystem();
 </script></body></html>

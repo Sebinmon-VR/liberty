@@ -3,163 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Liberty Plus</title>
+    <title>Management Center | Liberty Plus</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; }
         .bg-navy { background-color: #082866; }
         .text-navy { color: #082866; }
         .bg-aqua { background-color: #40B8D5; }
         .text-aqua { color: #40B8D5; }
-        .border-aqua { border-color: #40B8D5; }
         
-        .tab-btn.active {
-            background-color: #40B8D5;
-            color: #082866;
-            box-shadow: 0 4px 15px rgba(64, 184, 213, 0.3);
+        /* Custom Tooltips */
+        [data-tooltip] { position: relative; cursor: pointer; }
+        [data-tooltip]:before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            padding: 8px 12px;
+            background: #082866;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            white-space: nowrap;
+            border-radius: 8px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(8, 40, 102, 0.2);
+            z-index: 100;
         }
+        [data-tooltip]:hover:before { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .tab-active { background-color: #082866; color: white; box-shadow: 0 10px 20px rgba(8, 40, 102, 0.1); }
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-20">
+<body class="min-h-screen">
 
-<nav class="bg-navy text-white px-8 py-4 flex justify-between items-center shadow-lg border-b-4 border-aqua sticky top-0 z-50">
-    <div class="flex items-center gap-3">
-        <h1 class="text-2xl font-black uppercase tracking-tighter">Liberty Admin</h1>
-    </div>
-    <div class="flex items-center gap-6">
-        <div class="flex bg-white/10 p-1 rounded-full">
-            <button onclick="showTab('bookings')" id="tab-btn-bookings" class="tab-btn active px-6 py-2 rounded-full text-sm font-bold transition-all">Bookings</button>
-            <button onclick="showTab('services')" id="tab-btn-services" class="tab-btn px-6 py-2 rounded-full text-sm font-bold transition-all">Manage Services</button>
+<!-- Premium Top Navigation -->
+<nav class="sticky top-0 z-[100] bg-white border-b border-slate-100 px-8 py-4 flex justify-between items-center backdrop-blur-md bg-white/80">
+    <div class="flex items-center gap-4">
+        <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center text-white shadow-lg shadow-navy/20">
+            <span class="material-symbols-outlined font-bold">diamond</span>
         </div>
-        <div class="h-8 w-[1px] bg-white/20"></div>
-        <span class="text-slate-300 font-semibold text-sm hidden md:block">Welcome, {{ session.get('admin_username') }}</span>
-        <a href="{{ url_for('admin_logout') }}" class="bg-aqua text-navy px-6 py-2 rounded-full font-bold hover:bg-white transition-all text-sm shadow-md">Logout</a>
+        <div>
+            <h1 class="text-lg font-black text-navy uppercase tracking-tighter leading-none">Liberty Admin</h1>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Command Center v10</p>
+        </div>
+    </div>
+    
+    <div class="flex items-center gap-6">
+        <div class="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-2xl">
+            <button onclick="switchTab('active')" id="btn-active" class="tab-active px-6 py-2 rounded-xl text-xs font-bold transition-all">Active</button>
+            <button onclick="switchTab('done')" id="btn-done" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Archived</button>
+            <button onclick="switchTab('catalog')" id="btn-catalog" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Catalog</button>
+            <button onclick="switchTab('system')" id="btn-system" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">System</button>
+        </div>
+        <div class="h-8 w-[1px] bg-slate-200"></div>
+        <a href="{{ url_for('admin_logout') }}" data-tooltip="Sign Out Safely" class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all">
+            <span class="material-symbols-outlined text-lg">logout</span>
+        </a>
     </div>
 </nav>
 
-<main class="max-w-7xl mx-auto p-8 md:p-12">
+<main class="max-w-7xl mx-auto p-8 lg:p-12">
     
-    <!-- Bookings Tab -->
-    <div id="tab-bookings" class="tab-content">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div>
-                <h2 class="text-4xl font-black text-navy uppercase tracking-tighter">Active Bookings</h2>
-                <p class="text-slate-500 font-semibold mt-2">Manage all customer service requests</p>
-            </div>
-            <div class="flex gap-4">
-                <div class="bg-white px-8 py-4 rounded-3xl shadow-sm border border-slate-200 text-center">
-                    <span class="text-3xl font-black text-navy">{{ bookings|length }}</span>
-                    <span class="text-slate-400 font-bold ml-2 uppercase text-xs tracking-widest block md:inline">Total Bookings</span>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-hover">
+            <div class="flex justify-between items-start mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-navy/5 flex items-center justify-center text-navy">
+                    <span class="material-symbols-outlined">analytics</span>
                 </div>
+                <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Global</span>
             </div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Orders</p>
+            <h3 class="text-3xl font-black text-navy">{{ stats.total }}</h3>
         </div>
-
-        <div class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-navy text-white uppercase text-xs tracking-[0.2em]">
-                        <tr>
-                            <th class="px-8 py-6">Customer</th>
-                            <th class="px-8 py-6">Vehicle & Service</th>
-                            <th class="px-8 py-6">Date & Time</th>
-                            <th class="px-8 py-6">Type</th>
-                            <th class="px-8 py-6">Cost</th>
-                            <th class="px-8 py-6 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        {% for booking in bookings %}
-                        <tr class="hover:bg-slate-50 transition-colors">
-                            <td class="px-8 py-6">
-                                <div class="font-bold text-navy">{{ booking.fullName }}</div>
-                                <div class="text-sm text-slate-500 font-semibold">{{ booking.phone }}</div>
-                                {% if booking.address and booking.address != 'On-Site' %}
-                                <div class="text-[10px] text-slate-400 font-bold uppercase mt-1 max-w-[200px] truncate" title="{{ booking.address }}">{{ booking.address }}</div>
-                                {% endif %}
-                            </td>
-                            <td class="px-8 py-6">
-                                <div class="font-bold text-navy uppercase tracking-tight text-sm">{{ booking.vehicleType }}</div>
-                                <div class="text-xs text-aqua font-bold">{{ booking.serviceType }}</div>
-                            </td>
-                            <td class="px-8 py-6">
-                                <div class="font-bold text-navy text-sm">{{ booking.preferredDate }}</div>
-                                <div class="text-[10px] text-slate-400 font-bold uppercase">{{ booking.preferredTime }}</div>
-                            </td>
-                            <td class="px-8 py-6">
-                                <span class="inline-block px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest {% if booking.bookingType == 'Home Booking' %}bg-aqua/10 text-aqua{% else %}bg-navy/10 text-navy{% endif %}">
-                                    {{ booking.bookingType }}
-                                </span>
-                            </td>
-                            <td class="px-8 py-6">
-                                <div class="text-lg font-black text-navy">AED {{ booking.totalCost }}</div>
-                            </td>
-                            <td class="px-8 py-6 text-right">
-                                <button class="text-slate-300 hover:text-navy transition-colors"><span class="material-symbols-outlined">more_vert</span></button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                        {% if not bookings %}
-                        <tr>
-                            <td colspan="6" class="px-8 py-24 text-center text-slate-400 font-bold italic">No bookings found in the system yet.</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-hover">
+            <div class="flex justify-between items-start mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-500">
+                    <span class="material-symbols-outlined">hourglass_empty</span>
+                </div>
+                <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Pending</span>
             </div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Awaiting Wash</p>
+            <h3 class="text-3xl font-black text-navy">{{ stats.pending }}</h3>
+        </div>
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-hover">
+            <div class="flex justify-between items-start mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-500">
+                    <span class="material-symbols-outlined">check_circle</span>
+                </div>
+                <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Completed</span>
+            </div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Finished Jobs</p>
+            <h3 class="text-3xl font-black text-navy">{{ stats.done }}</h3>
+        </div>
+        <div class="bg-white p-6 rounded-[2rem] border border-slate-100 card-hover">
+            <div class="flex justify-between items-start mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-aqua/10 flex items-center justify-center text-aqua">
+                    <span class="material-symbols-outlined">account_balance_wallet</span>
+                </div>
+                <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Finance</span>
+            </div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Revenue</p>
+            <h3 class="text-3xl font-black text-navy">AED {{ stats.revenue }}</h3>
         </div>
     </div>
 
-    <!-- Services Management Tab -->
-    <div id="tab-services" class="tab-content hidden">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div>
-                <h2 class="text-4xl font-black text-navy uppercase tracking-tighter">Manage Services</h2>
-                <p class="text-slate-500 font-semibold mt-2">Update vehicle types and pricing</p>
-            </div>
-            <button onclick="openModal()" class="bg-navy text-white px-8 py-4 rounded-full font-bold hover:bg-aqua hover:text-navy transition-all flex items-center gap-2 shadow-xl shadow-navy/20">
-                <span class="material-symbols-outlined">add</span>
-                Add Vehicle Type
+    <!-- Active Bookings View -->
+    <div id="tab-active" class="content-section space-y-6">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-black text-navy uppercase tracking-tighter">Active Queue</h2>
+            <button onclick="openBookingModal()" class="bg-navy text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-aqua hover:text-navy transition-all shadow-xl shadow-navy/20 flex items-center gap-2">
+                <span class="material-symbols-outlined text-sm">add_circle</span> New Reservation
             </button>
         </div>
-
-        <div class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead class="bg-navy text-white uppercase text-[10px] tracking-[0.2em]">
-                        <tr>
-                            <th class="px-8 py-6">Vehicle Type</th>
-                            <th class="px-4 py-6 text-center">Full Wash</th>
-                            <th class="px-4 py-6 text-center">Body Wash</th>
-                            <th class="px-4 py-6 text-center">Water Wash</th>
-                            <th class="px-4 py-6 text-center">Oil/Filter</th>
-                            <th class="px-8 py-6 text-right">Actions</th>
+        
+        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto no-scrollbar">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50/50 border-b border-slate-100">
+                            <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Customer</th>
+                            <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vehicle / Service</th>
+                            <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Appointment</th>
+                            <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Pricing</th>
+                            <th class="px-8 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        {% for service in services %}
-                        <tr class="hover:bg-slate-50 transition-colors">
+                    <tbody class="divide-y divide-slate-50">
+                        {% for b in bookings|selectattr("status", "equalto", "pending") %}
+                        <tr class="hover:bg-slate-50/30 transition-colors">
                             <td class="px-8 py-6">
-                                <div class="font-bold text-navy uppercase tracking-tight">{{ service.vehicleType }}</div>
-                                <div class="text-[10px] text-slate-400 font-bold">ID: {{ service.id }}</div>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-navy font-bold text-xs">{{ b.fullName[:1] }}</div>
+                                    <div>
+                                        <p class="font-bold text-navy text-sm">{{ b.fullName }}</p>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase">{{ b.phone }}</p>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-6 text-center">
-                                <div class="font-bold text-navy">AED {{ service.fullWash }}</div>
+                            <td class="px-6 py-6">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-300 text-lg">commute</span>
+                                    <div>
+                                        <p class="text-[11px] font-black text-navy uppercase">{{ b.vehicleType }}</p>
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{{ b.serviceType }}</p>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-6 text-center">
-                                <div class="font-bold text-navy">AED {{ service.bodyWash }}</div>
+                            <td class="px-6 py-6">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-slate-300 text-lg">event</span>
+                                    <div>
+                                        <p class="text-[11px] font-black text-navy uppercase">{{ b.preferredDate }}</p>
+                                        <p class="text-[10px] text-aqua font-bold uppercase">{{ b.preferredTime }}</p>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-6 text-center">
-                                <div class="font-bold text-navy">AED {{ service.waterWash }}</div>
-                            </td>
-                            <td class="px-4 py-6 text-center">
-                                <div class="font-bold text-navy">AED {{ service.oilAndFilterChange }}</div>
+                            <td class="px-6 py-6">
+                                <span class="bg-aqua/10 text-aqua px-4 py-1 rounded-lg text-[11px] font-extrabold">AED {{ b.totalCost }}</span>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <div class="flex justify-end gap-3">
-                                    <button onclick='editService(JSON.parse(this.dataset.service))' data-service='{{ service|tojson|safe }}' class="p-2 rounded-xl bg-slate-100 text-slate-500 hover:bg-navy hover:text-white transition-all"><span class="material-symbols-outlined text-sm">edit</span></button>
-                                    <button onclick="deleteService('{{ service.id }}')" class="p-2 rounded-xl bg-slate-100 text-red-400 hover:bg-red-500 hover:text-white transition-all"><span class="material-symbols-outlined text-sm">delete</span></button>
+                                <div class="flex justify-end gap-2">
+                                    <button onclick="markStatus('{{ b.id }}', 'done')" data-tooltip="Mark as Done" class="w-10 h-10 rounded-xl bg-green-50 text-green-500 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-lg">check</span>
+                                    </button>
+                                    <button onclick="deleteBooking('{{ b.id }}')" data-tooltip="Cancel Order" class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
+                                        <span class="material-symbols-outlined text-lg">close</span>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -169,141 +189,277 @@
             </div>
         </div>
     </div>
-</main>
 
-<!-- Modal for Add/Edit -->
-<div id="service-modal" class="fixed inset-0 bg-navy/80 backdrop-blur-md z-[100] hidden flex items-center justify-center p-6">
-    <div class="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-        <div class="p-10">
-            <div class="flex justify-between items-center mb-10">
-                <h3 id="modal-title" class="text-3xl font-black text-navy uppercase tracking-tighter">Add Vehicle Type</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-navy"><span class="material-symbols-outlined">close</span></button>
+    <!-- Done Bookings View -->
+    <div id="tab-done" class="content-section hidden space-y-6">
+        <h2 class="text-3xl font-black text-navy uppercase tracking-tighter mb-8">System Archive</h2>
+        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+             <div class="overflow-x-auto no-scrollbar">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-50/50 border-b border-slate-100">
+                            <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Completion Log</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vehicle</th>
+                            <th class="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest">Date Finish</th>
+                            <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for b in bookings|selectattr("status", "equalto", "done") %}
+                        <tr class="opacity-70 hover:opacity-100 transition-opacity">
+                            <td class="px-8 py-5 font-bold text-navy text-sm">{{ b.fullName }}</td>
+                            <td class="px-6 py-5 uppercase text-[10px] font-black text-slate-400">{{ b.vehicleType }}</td>
+                            <td class="px-6 py-5 uppercase text-[10px] font-black text-slate-400">{{ b.preferredDate }}</td>
+                            <td class="px-8 py-5 text-right font-black text-green-500">AED {{ b.totalCost }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+             </div>
+        </div>
+    </div>
+
+    <!-- Catalog View -->
+    <div id="tab-catalog" class="content-section hidden space-y-10">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-black text-navy uppercase tracking-tighter">Service Catalog</h2>
+            <button onclick="openServiceModal()" class="bg-aqua text-navy px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-navy hover:text-white transition-all">
+                Add Vehicle Type
+            </button>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for s in services %}
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 card-hover relative group">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-aqua group-hover:text-navy transition-all">
+                        <span class="material-symbols-outlined">directions_car</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick='editService(JSON.parse(this.dataset.service))' data-service='{{ s|tojson|safe }}' data-tooltip="Update Specs" class="text-slate-300 hover:text-navy transition-colors"><span class="material-symbols-outlined text-lg">edit_note</span></button>
+                        <button onclick="deleteService('{{ s.id }}')" data-tooltip="Remove Category" class="text-slate-300 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-lg">delete_sweep</span></button>
+                    </div>
+                </div>
+                <h4 class="text-xl font-black text-navy uppercase mb-6 tracking-tighter">{{ s.vehicleType }}</h4>
+                <div class="space-y-4">
+                    {% for item in s.services %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ item.name }}</span>
+                        <span class="text-xs font-black text-navy">AED {{ item.price }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            
-            <form id="service-form" class="space-y-6">
-                <input type="hidden" id="service-id">
-                <div class="space-y-2">
-                    <label class="text-xs font-bold text-navy uppercase tracking-widest pl-1">Vehicle Type Name</label>
-                    <input type="text" id="v-name" required class="w-full px-6 py-4 rounded-2xl bg-slate-100 border-none outline-none focus:ring-2 focus:ring-aqua transition-all font-bold text-navy" placeholder="e.g. Luxury SUV">
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- System View -->
+    <div id="tab-system" class="content-section hidden grid lg:grid-cols-2 gap-12">
+        <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-xl font-black text-navy uppercase">Business Hours</h2>
+                <button onclick="addTimingRow()" class="text-aqua text-[10px] font-black uppercase flex items-center gap-1"><span class="material-symbols-outlined text-sm">add</span> Slot</button>
+            </div>
+            <form id="timings-form" class="space-y-6">
+                <div id="timing-rows" class="grid grid-cols-2 gap-4 max-h-60 overflow-y-auto no-scrollbar pr-2">
+                    {% for t in timings %}
+                    <div class="flex gap-2 items-center bg-slate-50 p-2 rounded-xl">
+                        <input type="text" value="{{ t }}" required class="flex-1 bg-transparent border-none font-bold text-navy text-xs uppercase">
+                        <button type="button" onclick="this.parentElement.remove()" class="text-red-300 hover:text-red-500"><span class="material-symbols-outlined text-sm">remove</span></button>
+                    </div>
+                    {% endfor %}
                 </div>
-                
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-navy uppercase tracking-widest pl-1">Full Wash (AED)</label>
-                        <input type="number" id="v-full" step="0.01" value="0" class="w-full px-4 py-3 rounded-xl bg-slate-100 border-none outline-none focus:ring-1 focus:ring-aqua text-sm font-bold">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-navy uppercase tracking-widest pl-1">Body Wash (AED)</label>
-                        <input type="number" id="v-body" step="0.01" value="0" class="w-full px-4 py-3 rounded-xl bg-slate-100 border-none outline-none focus:ring-1 focus:ring-aqua text-sm font-bold">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-navy uppercase tracking-widest pl-1">Water Wash (AED)</label>
-                        <input type="number" id="v-water" step="0.01" value="0" class="w-full px-4 py-3 rounded-xl bg-slate-100 border-none outline-none focus:ring-1 focus:ring-aqua text-sm font-bold">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-navy uppercase tracking-widest pl-1">Oil Change (AED)</label>
-                        <input type="number" id="v-oil" step="0.01" value="0" class="w-full px-4 py-3 rounded-xl bg-slate-100 border-none outline-none focus:ring-1 focus:ring-aqua text-sm font-bold">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-navy uppercase tracking-widest pl-1">Oil & Filter (AED)</label>
-                        <input type="number" id="v-oil-filt" step="0.01" value="0" class="w-full px-4 py-3 rounded-xl bg-slate-100 border-none outline-none focus:ring-1 focus:ring-aqua text-sm font-bold">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-navy uppercase tracking-widest pl-1">Grease (AED)</label>
-                        <input type="number" id="v-grease" step="0.01" value="0" class="w-full px-4 py-3 rounded-xl bg-slate-100 border-none outline-none focus:ring-1 focus:ring-aqua text-sm font-bold">
-                    </div>
-                </div>
-                
-                <div class="pt-6 flex gap-4">
-                    <button type="submit" class="flex-1 py-5 rounded-full bg-navy text-white font-extrabold text-lg hover:bg-aqua hover:text-navy transition-all shadow-xl shadow-navy/20 active:scale-95">Save Changes</button>
-                    <button type="button" onclick="closeModal()" class="px-10 py-5 rounded-full bg-slate-100 text-slate-500 font-bold text-lg hover:bg-slate-200 transition-all">Cancel</button>
-                </div>
+                <button type="submit" class="w-full py-5 rounded-full bg-navy text-white font-black uppercase text-xs tracking-widest hover:bg-aqua hover:text-navy transition-all shadow-lg">Restore Schedule</button>
             </form>
         </div>
+        <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
+            <h2 class="text-xl font-black text-navy uppercase mb-8">Security & Access</h2>
+            <div class="space-y-4 mb-10 max-h-60 overflow-y-auto no-scrollbar">
+                {% for admin in admins %}
+                <div class="flex justify-between items-center p-5 bg-slate-50 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-slate-200">shield_person</span>
+                        <span class="font-bold text-navy">{{ admin.username }}</span>
+                    </div>
+                    <div class="flex gap-4">
+                        <button onclick='editAdmin(JSON.parse(this.dataset.admin))' data-admin='{{ admin|tojson|safe }}' data-tooltip="Reset Pass" class="text-slate-300 hover:text-navy transition-colors"><span class="material-symbols-outlined text-lg">admin_panel_settings</span></button>
+                        <button onclick="deleteAdmin('{{ admin.id }}')" data-tooltip="Revoke Key" class="text-slate-300 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-lg">person_remove</span></button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <button onclick="openAdminModal()" class="w-full py-5 rounded-full bg-slate-900 text-white font-black uppercase text-xs tracking-widest hover:bg-navy shadow-xl">Issue New Key</button>
+        </div>
+    </div>
+</main>
+
+<!-- Unified Modals Reskinned -->
+<div id="overlay" class="fixed inset-0 bg-[#082866]/90 backdrop-blur-xl z-[200] hidden flex items-center justify-center p-6" onclick="closeAllModals()">
+    <!-- New Booking Modal -->
+    <div id="booking-modal" class="bg-white w-full max-w-3xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+        <h3 class="text-3xl font-black text-navy uppercase tracking-tighter mb-10">Manual Reservation</h3>
+        <form id="admin-booking-form" class="space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Client Name</label><input type="text" id="mb-name" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></div>
+                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Primary Phone</label><input type="tel" id="mb-phone" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Vehicle Category</label><select id="mb-vehicle" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></select></div>
+                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Requested Service</label><select id="mb-service" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></select></div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Select Date</label><input type="date" id="mb-date" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></div>
+                <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 uppercase tracking-widest pl-2">Target Slot</label><select id="mb-time" required class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy"></select></div>
+            </div>
+            <div class="flex justify-between items-center pt-8 border-t border-slate-50">
+                <div id="mb-price" class="text-4xl font-black text-navy">AED 0.00</div>
+                <button type="submit" class="bg-aqua text-navy px-12 py-5 rounded-full font-black uppercase text-xs tracking-widest shadow-xl shadow-aqua/20">Authorize Booking</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Service Catalog Modal -->
+    <div id="service-modal" class="bg-white w-full max-w-xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+        <h3 class="text-2xl font-black text-navy uppercase mb-8">Catalog Specification</h3>
+        <form id="service-form" class="space-y-6">
+            <input type="hidden" id="service-id"><input type="text" id="v-name" required placeholder="Vehicle Class Name" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy">
+            <div id="service-rows" class="space-y-3 max-h-48 overflow-y-auto pr-2 no-scrollbar"></div>
+            <button onclick="addServiceRow()" type="button" class="w-full py-4 border-2 border-dashed border-slate-100 rounded-2xl text-[9px] font-black uppercase">+ New Entry Row</button>
+            <button type="submit" class="w-full py-5 rounded-full bg-navy text-white font-black uppercase text-xs tracking-widest">Update Specs</button>
+        </form>
+    </div>
+
+    <!-- Security Modal -->
+    <div id="admin-modal" class="bg-white w-full max-w-md rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+        <h3 class="text-2xl font-black text-navy uppercase mb-8">Access Profile</h3>
+        <form id="admin-form" class="space-y-6">
+            <input type="hidden" id="admin-id"><input type="text" id="a-user" required placeholder="Security Identity" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy">
+            <input type="text" id="a-pass" required placeholder="Pass Authorization" class="w-full px-6 py-4 rounded-2xl bg-slate-50 border-none font-bold text-navy">
+            <button type="submit" class="w-full py-5 rounded-full bg-navy text-white font-black uppercase text-xs tracking-widest">Update Access</button>
+        </form>
     </div>
 </div>
 
+<!-- Data Stores -->
+<div id="services-data" class="hidden" data-services='{{ services|tojson|safe }}'></div>
+<div id="timings-data" class="hidden" data-timings='{{ timings|tojson|safe }}'></div>
+
 <script>
-    function showTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    const servicesData = JSON.parse(document.getElementById('services-data').dataset.services);
+    const timingsData = JSON.parse(document.getElementById('timings-data').dataset.timings);
+
+    function switchTab(tab) {
+        document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('nav button').forEach(el => el.classList.remove('tab-active'));
         document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        document.getElementById(`tab-btn-${tab}`).classList.add('active');
+        document.getElementById(`btn-${tab}`).classList.add('tab-active');
     }
 
-    const modal = document.getElementById('service-modal');
-    const form = document.getElementById('service-form');
-
-    function openModal() {
-        document.getElementById('modal-title').textContent = 'Add Vehicle Type';
-        document.getElementById('service-id').value = '';
-        form.reset();
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+    async function markStatus(id, status) {
+        if (!confirm('Mark job as officially completed?')) return;
+        const res = await fetch(`/api/admin/bookings/${id}/status`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status})});
+        if (res.ok) location.reload();
+    }
+    
+    async function deleteBooking(id) {
+        if (!confirm('Permanently cancel this order?')) return;
+        const res = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE' });
+        if (res.ok) location.reload();
     }
 
-    function closeModal() {
-        modal.classList.add('hidden');
-        document.body.style.overflow = 'auto';
+    const overlay = document.getElementById('overlay');
+    function closeAllModals() { 
+        overlay.classList.add('hidden'); 
+        ['booking-modal', 'service-modal', 'admin-modal'].forEach(m => document.getElementById(m).classList.add('hidden'));
     }
 
-    function editService(service) {
-        document.getElementById('modal-title').textContent = 'Edit Vehicle Type';
-        document.getElementById('service-id').value = service.id;
-        document.getElementById('v-name').value = service.vehicleType;
-        document.getElementById('v-full').value = service.fullWash || 0;
-        document.getElementById('v-body').value = service.bodyWash || 0;
-        document.getElementById('v-water').value = service.waterWash || 0;
-        document.getElementById('v-oil').value = service.oilChangeOnly || 0;
-        document.getElementById('v-oil-filt').value = service.oilAndFilterChange || 0;
-        document.getElementById('v-grease').value = service.greaseChange || 0;
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+    function openBookingModal() {
+        const vS = document.getElementById('mb-vehicle');
+        const tS = document.getElementById('mb-time');
+        vS.innerHTML = servicesData.map(s => `<option value="${s.vehicleType}">${s.vehicleType}</option>`).join('');
+        tS.innerHTML = timingsData.map(t => `<option value="${t}">${t}</option>`).join('');
+        updateManualPrice();
+        overlay.classList.remove('hidden');
+        document.getElementById('booking-modal').classList.remove('hidden');
     }
 
-    form.onsubmit = async (e) => {
-        e.preventDefault();
-        const data = {
-            id: document.getElementById('service-id').value,
-            vehicleType: document.getElementById('v-name').value,
-            fullWash: parseFloat(document.getElementById('v-full').value),
-            bodyWash: parseFloat(document.getElementById('v-body').value),
-            waterWash: parseFloat(document.getElementById('v-water').value),
-            oilChangeOnly: parseFloat(document.getElementById('v-oil').value),
-            oilAndFilterChange: parseFloat(document.getElementById('v-oil-filt').value),
-            greaseChange: parseFloat(document.getElementById('v-grease').value)
-        };
-
-        try {
-            const res = await fetch('/api/admin/services', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
-                location.reload();
-            } else {
-                const err = await res.json();
-                alert('Error saved: ' + err.error);
-            }
-        } catch (err) {
-            alert('Connection failed');
-        }
+    document.getElementById('mb-vehicle').onchange = updateManualPrice;
+    document.getElementById('mb-service').onchange = () => {
+        const p = document.getElementById('mb-service').selectedOptions[0].dataset.price;
+        document.getElementById('mb-price').textContent = `AED ${parseFloat(p).toFixed(2)}`;
     };
 
-    async function deleteService(id) {
-        if (!confirm('Are you sure you want to delete this vehicle type?')) return;
-        try {
-            const res = await fetch(`/api/admin/services/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                location.reload();
-            } else {
-                alert('Failed to delete');
-            }
-        } catch (err) {
-            alert('Connection failed');
-        }
+    function updateManualPrice() {
+        const v = servicesData.find(s => s.vehicleType === document.getElementById('mb-vehicle').value);
+        const sS = document.getElementById('mb-service');
+        sS.innerHTML = v.services.map(s => `<option value="${s.name}" data-price="${s.price}">${s.name}</option>`).join('');
+        document.getElementById('mb-price').textContent = `AED ${parseFloat(v.services[0].price).toFixed(2)}`;
     }
+
+    document.getElementById('admin-booking-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const data = {
+            fullName: document.getElementById('mb-name').value,
+            phone: document.getElementById('mb-phone').value,
+            vehicleType: document.getElementById('mb-vehicle').value,
+            serviceType: document.getElementById('mb-service').value,
+            totalCost: parseFloat(document.getElementById('mb-service').selectedOptions[0].dataset.price),
+            preferredDate: document.getElementById('mb-date').value,
+            preferredTime: document.getElementById('mb-time').value,
+            bookingType: 'On-Site Entry'
+        };
+        await fetch('/api/admin/bookings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
+        location.reload();
+    };
+
+    function addServiceRow(n='', p='') {
+        const div = document.createElement('div');
+        div.className = 'flex gap-2 items-center bg-slate-50 p-2 rounded-xl';
+        div.innerHTML = `<input type="text" value="${n}" required placeholder="Service" class="flex-1 bg-transparent border-none font-bold text-navy text-[11px] uppercase"><input type="number" value="${p}" required placeholder="AED" class="w-16 bg-transparent border-none font-bold text-navy text-[11px] uppercase"><button type="button" onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500"><span class="material-symbols-outlined text-sm">close</span></button>`;
+        document.getElementById('service-rows').appendChild(div);
+    }
+
+    function editService(s) {
+        document.getElementById('service-id').value = s.id;
+        document.getElementById('v-name').value = s.vehicleType;
+        document.getElementById('service-rows').innerHTML = '';
+        s.services.forEach(item => addServiceRow(item.name, item.price));
+        overlay.classList.remove('hidden');
+        document.getElementById('service-modal').classList.remove('hidden');
+    }
+
+    document.getElementById('service-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const services = Array.from(document.getElementById('service-rows').querySelectorAll('div')).map(row => {
+            const i = row.querySelectorAll('input'); return {name: i[0].value, price: parseFloat(i[1].value)};
+        });
+        await fetch('/api/admin/services', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id: document.getElementById('service-id').value, vehicleType: document.getElementById('v-name').value, services})});
+        location.reload();
+    }
+
+    function addTimingRow() {
+        const div = document.createElement('div');
+        div.className = 'flex gap-2 items-center bg-slate-50 p-2 rounded-xl';
+        div.innerHTML = `<input type="text" placeholder="Shift Label" required class="flex-1 bg-transparent border-none font-bold text-navy text-[10px] uppercase"><button type="button" onclick="this.parentElement.remove()" class="text-slate-300 hover:text-red-500"><span class="material-symbols-outlined text-sm">remove</span></button>`;
+        document.getElementById('timing-rows').appendChild(div);
+    }
+    document.getElementById('timings-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const slots = Array.from(document.getElementById('timing-rows').querySelectorAll('input')).map(i => i.value);
+        await fetch('/api/admin/settings/timings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({slots})});
+        location.reload();
+    };
+
+    function openAdminModal() { overlay.classList.remove('hidden'); document.getElementById('admin-modal').classList.remove('hidden'); }
+    function editAdmin(a) { document.getElementById('admin-id').value = a.id; document.getElementById('a-user').value = a.username; document.getElementById('a-pass').value = a.password; openAdminModal(); }
+    document.getElementById('admin-form').onsubmit = async (e) => {
+        e.preventDefault();
+        await fetch('/api/admin/admins', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({id: document.getElementById('admin-id').value, username: document.getElementById('a-user').value, password: document.getElementById('a-pass').value})});
+        location.reload();
+    };
+
+    async function deleteService(id) { if(confirm('Permanently remove vehicle class?')) { await fetch(`/api/admin/services/${id}`, {method:'DELETE'}); location.reload(); } }
+    async function deleteAdmin(id) { if(confirm('Delete administrator key?')) { await fetch(`/api/admin/admins/${id}`, {method:'DELETE'}); location.reload(); } }
 </script>
 
 </body>
