@@ -179,7 +179,10 @@
             <div id="tab-system" class="content-section hidden">
                 <div class="grid lg:grid-cols-2 gap-12 pt-8">
                     <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
-                        <h2 class="text-xl font-black text-navy uppercase mb-8">Business Timings</h2>
+                        <div class="flex justify-between items-center mb-8">
+                            <h2 class="text-xl font-black text-navy uppercase">Business Timings</h2>
+                            <button type="button" onclick="addTimingRow()" class="text-aqua font-bold text-[10px] uppercase">+ Add Slot</button>
+                        </div>
                         <form id="timings-form" class="space-y-6">
                             <div id="timing-rows" class="grid grid-cols-2 gap-4 max-h-60 overflow-y-auto no-scrollbar">
                                 {% for t in timings %}
@@ -203,9 +206,14 @@
                             {% for admin in admins %}
                             <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">
                                 <span class="font-bold text-navy text-sm">{{ admin.username }}</span>
-                                <button onclick='editAdmin(JSON.parse(this.dataset.admin))'
-                                    data-admin='{{ admin|tojson|safe }}' class="text-slate-300 hover:text-navy"><span
-                                        class="material-symbols-outlined text-sm">edit</span></button>
+                                <div class="flex gap-2">
+                                    <button onclick='editAdmin(JSON.parse(this.dataset.admin))'
+                                        data-admin='{{ admin|tojson|safe }}' class="text-slate-300 hover:text-navy"><span
+                                            class="material-symbols-outlined text-sm">edit</span></button>
+                                    <button onclick="deleteAdmin('{{ admin.id }}')"
+                                        class="text-slate-300 hover:text-red-500"><span
+                                            class="material-symbols-outlined text-sm">delete</span></button>
+                                </div>
                             </div>
                             {% endfor %}
                         </div>
@@ -307,6 +315,43 @@
                 <div class="flex justify-between items-center pt-6">
                     <div id="mb-price" class="text-3xl font-black text-navy">AED 0.00</div><button type="submit"
                         class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Authorize</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Service Modal -->
+        <div id="service-modal" class="bg-white w-full max-w-2xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+            <h3 id="service-modal-title" class="text-2xl font-black text-navy uppercase mb-8">Vehicle Catalog</h3>
+            <form id="service-form" class="space-y-6">
+                <input type="hidden" id="service-id">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-navy uppercase tracking-widest pl-1">Vehicle Type</label>
+                    <input type="text" id="service-vehicle-type" required placeholder="e.g., Luxury Sedan" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-navy uppercase tracking-widest pl-1">Services & Prices</label>
+                        <button type="button" onclick="addServiceRow()" class="text-aqua font-bold text-[10px] uppercase tracking-wider">+ Add Row</button>
+                    </div>
+                    <div id="service-rows" class="space-y-3 max-h-60 overflow-y-auto no-scrollbar">
+                        <!-- Dynamic rows here -->
+                    </div>
+                </div>
+                <div class="flex justify-end pt-6">
+                    <button type="submit" class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Update Catalog</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Admin Modal -->
+        <div id="admin-modal" class="bg-white w-full max-w-md rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+            <h3 id="admin-modal-title" class="text-2xl font-black text-navy uppercase mb-8">System Access</h3>
+            <form id="admin-form" class="space-y-6">
+                <input type="hidden" id="admin-id">
+                <input type="text" id="admin-username" required placeholder="Username" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                <input type="password" id="admin-password" required placeholder="Access Key / Password" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                <div class="flex justify-end pt-6">
+                    <button type="submit" class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Confirm Access</button>
                 </div>
             </form>
         </div>
@@ -441,6 +486,109 @@
             if (res.ok) { closeDetails(); syncData(); }
         }
 
+        // Service Catalog Logic
+        function openServiceModal() {
+            document.getElementById('service-id').value = '';
+            document.getElementById('service-vehicle-type').value = '';
+            document.getElementById('service-rows').innerHTML = '';
+            addServiceRow();
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('service-modal').classList.remove('hidden');
+        }
+
+        function addServiceRow(name = '', price = '') {
+            const row = document.createElement('div');
+            row.className = "flex gap-2 items-center bg-slate-50 p-3 rounded-xl";
+            row.innerHTML = `
+                <input type="text" placeholder="Service Name" value="${name}" required class="flex-1 bg-transparent border-none font-bold text-navy text-xs uppercase">
+                <input type="number" placeholder="Price" value="${price}" required class="w-24 bg-transparent border-none font-bold text-aqua text-xs">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-300 hover:text-red-500"><span class="material-symbols-outlined text-sm">remove</span></button>
+            `;
+            document.getElementById('service-rows').appendChild(row);
+        }
+
+        async function editService(s) {
+            document.getElementById('service-id').value = s.id;
+            document.getElementById('service-vehicle-type').value = s.vehicleType;
+            const rows = document.getElementById('service-rows');
+            rows.innerHTML = '';
+            s.services.forEach(item => addServiceRow(item.name, item.price));
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('service-modal').classList.remove('hidden');
+        }
+
+        async function deleteService(id) {
+            if (!confirm('Permanently delete this vehicle type?')) return;
+            const res = await fetch(`/api/admin/services/${id}`, { method: 'DELETE' });
+            if (res.ok) location.reload();
+        }
+
+        document.getElementById('service-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('service-id').value;
+            const vehicleType = document.getElementById('service-vehicle-type').value;
+            const services = Array.from(document.getElementById('service-rows').children).map(row => ({
+                name: row.querySelector('input[type="text"]').value,
+                price: row.querySelector('input[type="number"]').value
+            }));
+            const data = { vehicleType, services };
+            if (id) data.id = id;
+            const res = await fetch('/api/admin/services', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            if (res.ok) location.reload();
+        };
+
+        // Admin Management Logic
+        function openAdminModal() {
+            document.getElementById('admin-id').value = '';
+            document.getElementById('admin-username').value = '';
+            document.getElementById('admin-password').value = '';
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('admin-modal').classList.remove('hidden');
+        }
+
+        async function editAdmin(a) {
+            document.getElementById('admin-id').value = a.id;
+            document.getElementById('admin-username').value = a.username;
+            document.getElementById('admin-password').value = a.password;
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('admin-modal').classList.remove('hidden');
+        }
+
+        async function deleteAdmin(id) {
+            if (!confirm('Delete this administrator?')) return;
+            const res = await fetch(`/api/admin/admins/${id}`, { method: 'DELETE' });
+            if (res.ok) location.reload();
+        }
+
+        document.getElementById('admin-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('admin-id').value;
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+            const data = { username, password };
+            if (id) data.id = id;
+            const res = await fetch('/api/admin/admins', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            if (res.ok) location.reload();
+        };
+
+        // Timing Management Logic
+        function addTimingRow() {
+            const row = document.createElement('div');
+            row.className = "flex gap-2 items-center bg-slate-50 p-2 rounded-xl";
+            row.innerHTML = `
+                <input type="text" placeholder="00:00 AM - 00:00 PM" required class="flex-1 bg-transparent border-none font-bold text-navy text-xs uppercase">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-300 hover:text-red-500"><span class="material-symbols-outlined text-sm">remove</span></button>
+            `;
+            document.getElementById('timing-rows').appendChild(row);
+        }
+
+        document.getElementById('timings-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const slots = Array.from(document.getElementById('timing-rows').querySelectorAll('input')).map(i => i.value);
+            const res = await fetch('/api/admin/settings/timings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slots }) });
+            if (res.ok) alert('Business hours updated successfully');
+        };
+
         function openBookingModal() { populateManualDropdowns(); document.getElementById('overlay').classList.remove('hidden'); document.getElementById('booking-modal').classList.remove('hidden'); }
         function populateManualDropdowns() {
             const vS = document.getElementById('mb-vehicle');
@@ -466,6 +614,11 @@
             await fetch('/api/admin/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             closeAllModals(); syncData();
         };
+
+        function closeAllModals() {
+            document.getElementById('overlay').classList.add('hidden');
+            document.querySelectorAll('.animate-in').forEach(m => m.classList.add('hidden'));
+        }
 
         window.onload = () => {
             {% for b in bookings %}
