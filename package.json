@@ -1,0 +1,14 @@
+{
+  "name": "liberty-plus",
+  "version": "1.0.0",
+  "description": "Premium Automotive Care Build System",
+  "main": "app.py",
+  "scripts": {
+    "dev": "npx @tailwindcss/cli -i ./static/assets/css/input.css -o ./static/assets/css/main.css --watch",
+    "build": "npx @tailwindcss/cli -i ./static/assets/css/input.css -o ./static/assets/css/main.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
+    "tailwindcss": "^4.2.2"
+  }
+}

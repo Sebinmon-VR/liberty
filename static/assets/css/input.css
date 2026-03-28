@@ -1,0 +1,260 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+
+@theme {
+  --color-brand-navy: #082866;
+  --color-brand-aqua: #40B8D5;
+  --color-navy: #082866;
+  --color-aqua: #40B8D5;
+  --color-on-secondary-container: #006375;
+  --color-on-primary: #ffffff;
+  --color-on-tertiary: #ffffff;
+  --color-outline: #757681;
+  --color-surface-bright: #f2fbfc;
+  --color-primary-container: #082866;
+  --color-secondary-fixed-dim: #40B8D5;
+  --color-primary-fixed: #dae1ff;
+  --color-on-error: #ffffff;
+  --color-inverse-surface: #293233;
+  --color-on-surface: #151d1e;
+  --color-on-primary-container: #dae1ff;
+  --color-surface-dim: #d3dcdd;
+  --color-on-tertiary-fixed: #360f00;
+  --color-on-surface-variant: #444650;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-fixed: #001f27;
+  --color-on-primary-fixed: #001849;
+  --color-surface-container: #e7f0f1;
+  --color-on-tertiary-container: #d37e59;
+  --color-primary: #082866;
+  --color-secondary-container: #40B8D5;
+  --color-surface-tint: #082866;
+  --color-surface-variant: #dbe4e5;
+  --color-surface-container-lowest: #ffffff;
+  --color-inverse-primary: #b3c5ff;
+  --color-secondary: #40B8D5;
+  --color-surface-container-highest: #dbe4e5;
+  --color-outline-variant: #c5c6d2;
+  --color-surface-container-low: #ecf5f6;
+  --color-secondary-fixed: #afecff;
+  --color-surface: #f2fbfc;
+  --color-tertiary: #300c00;
+  --color-surface-container-high: #e1eaeb;
+  --color-on-primary-fixed-variant: #2b4482;
+  --color-tertiary-fixed: #ffdbcd;
+  --color-on-background: #151d1e;
+  --color-inverse-on-surface: #e9f2f3;
+  --color-error: #ba1a1a;
+  --color-tertiary-container: #521a00;
+  --color-on-secondary-fixed-variant: #004e5d;
+  --color-tertiary-fixed-dim: #ffb598;
+  --color-on-error-container: #93000a;
+  --color-primary-fixed-dim: #b3c5ff;
+  --color-background: #f2fbfc;
+  --color-on-tertiary-fixed-variant: #753415;
+  --color-error-container: #ffdad6;
+
+  --font-headline: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Manrope", sans-serif;
+  --font-outfit: "Outfit", sans-serif;
+}
+
+
+/* Custom Component Styles */
+
+body {
+    font-family: var(--font-body);
+}
+
+.font-outfit {
+    font-family: var(--font-outfit);
+}
+
+.material-symbols-outlined {
+
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.hydro-gradient {
+    background: linear-gradient(135deg, #082866 0%, #001441 100%);
+}
+
+.aqua-gradient {
+    background: linear-gradient(180deg, #f2fbfc 0%, #e0f4f8 100%);
+}
+
+.aqua-accent-gradient {
+    background: linear-gradient(135deg, #40B8D5 0%, #082866 100%);
+}
+
+/* Before/After Slider */
+.comparison-slider {
+    position: relative;
+    width: 100%;
+    height: 80vh;
+    min-height: 500px;
+    overflow: hidden;
+    cursor: ew-resize;
+}
+
+.comparison-slider img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    pointer-events: none;
+}
+
+.comparison-slider .after-image {
+    clip-path: inset(0 0 0 50%);
+}
+
+.slider-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    background: white;
+    z-index: 30;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.slider-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    border: 4px solid #40B8D5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #082866;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+.label-before,
+.label-after {
+    position: absolute;
+    bottom: 40px;
+    padding: 8px 24px;
+    background: rgba(8, 40, 102, 0.8);
+    color: white;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+    z-index: 20;
+    pointer-events: none;
+}
+
+.label-before {
+    left: 40px;
+}
+
+.label-after {
+    right: 40px;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(8, 40, 102, 0.4) 0%, transparent 40%, transparent 60%, rgba(8, 40, 102, 0.4) 100%);
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Tooltips */
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]:before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    padding: 8px 12px;
+    background: #082866;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-radius: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+[data-tooltip]:hover:before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Admin Specific */
+.tab-active {
+    background-color: #082866;
+    color: white;
+    box-shadow: 0 10px 20px rgba(8, 40, 102, 0.1);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Split View Transitions */
+.content-main {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+}
+
+.content-split {
+    width: 66%;
+}
+
+#details-panel {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#details-panel.panel-active {
+    width: 34%;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Toast Animation */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.toast {
+    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}

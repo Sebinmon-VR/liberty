@@ -1,310 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Intelligent Command Center | Liberty Plus</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <style>
-        body { font-family: 'Outfit', sans-serif; background-color: #f8fafc; overflow-x: hidden; }
-        .bg-navy { background-color: #082866; }
-        .text-navy { color: #082866; }
-        .bg-aqua { background-color: #40B8D5; }
-        .text-aqua { color: #40B8D5; }
-        
-        /* Custom Tooltips */
-        [data-tooltip] { position: relative; }
-        [data-tooltip]:before {
-            content: attr(data-tooltip);
-            position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%) translateY(10px);
-            padding: 8px 12px; background: #082866; color: white; font-size: 10px; font-weight: 700;
-            text-transform: uppercase; white-space: nowrap; border-radius: 8px; opacity: 0;
-            pointer-events: none; transition: all 0.2s ease; z-index: 100;
-        }
-        [data-tooltip]:hover:before { opacity: 1; transform: translateX(-50%) translateY(0); }
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}">
 
-        .tab-active { background-color: #082866; color: white; box-shadow: 0 10px 20px rgba(8, 40, 102, 0.1); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Split View Transitions */
-        .content-main { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; }
-        .content-split { width: 66%; }
-        #details-panel { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 0; opacity: 0; pointer-events: none; }
-        #details-panel.panel-active { width: 34%; opacity: 1; pointer-events: auto; }
-
-        /* Toast Animation */
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .toast { animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-    </style>
 </head>
+
 <body class="min-h-screen">
 
-<!-- Notification Container -->
-<div id="toast-container" class="fixed top-24 right-8 z-[1000] flex flex-col gap-4 pointer-events-none"></div>
+    <!-- Notification Container -->
+    <div id="toast-container" class="fixed top-24 right-8 z-[1000] flex flex-col gap-4 pointer-events-none"></div>
 
-<nav class="sticky top-0 z-[100] bg-white/80 border-b border-slate-100 px-8 py-4 flex justify-between items-center backdrop-blur-md">
-    <div class="flex items-center gap-4">
-        <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center text-white shadow-xl"><span class="material-symbols-outlined">monitoring</span></div>
-        <div>
-            <h1 class="text-lg font-black text-navy uppercase tracking-tighter leading-none">Liberty Live</h1>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Command Center v14</p>
-        </div>
-    </div>
-    
-    <div class="flex items-center gap-4">
-        <div class="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-2xl">
-            <button onclick="switchTab('active')" id="btn-active" class="tab-active px-6 py-2 rounded-xl text-xs font-bold transition-all">Queue</button>
-            <button onclick="switchTab('done')" id="btn-done" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Archive</button>
-            <button onclick="switchTab('canceled')" id="btn-canceled" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Canceled</button>
-            <button onclick="switchTab('analytics')" id="btn-analytics" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Analytics</button>
-            <button onclick="switchTab('catalog')" id="btn-catalog" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Catalog</button>
-            <button onclick="switchTab('system')" id="btn-system" class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">System</button>
-        </div>
-        <a href="{{ url_for('admin_logout') }}" class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><span class="material-symbols-outlined">logout</span></a>
-    </div>
-</nav>
-
-<main class="w-full max-w-[1700px] mx-auto px-8 lg:px-12 py-8 flex gap-8 min-h-[calc(100vh-80px)]">
-    
-    <!-- LEFT SIDE: Main Content -->
-    <div id="main-content-flow" class="content-main space-y-8">
-        
-        <!-- Live Stats Grid -->
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-            <div onclick="switchTab('active')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all group">
-                <p class="text-[9px] font-black text-slate-300 group-hover:text-navy uppercase tracking-widest mb-1 transition-colors">Total</p>
-                <h3 id="stat-total" class="text-2xl font-black text-navy leading-none">{{ stats.total }}</h3>
-            </div>
-            <div onclick="switchTab('active')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all group">
-                <p class="text-[9px] font-black text-slate-300 group-hover:text-orange-500 uppercase tracking-widest mb-1 transition-colors">Pending</p>
-                <h3 id="stat-pending" class="text-2xl font-black text-orange-500 leading-none">{{ stats.pending }}</h3>
-            </div>
-            <div onclick="switchTab('done')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all group">
-                <p class="text-[9px] font-black text-slate-300 group-hover:text-green-500 uppercase tracking-widest mb-1 transition-colors">Completed</p>
-                <h3 id="stat-done" class="text-2xl font-black text-green-500 leading-none">{{ stats.done }}</h3>
-            </div>
-            <div onclick="switchTab('canceled')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all group">
-                <p class="text-[9px] font-black text-slate-300 group-hover:text-red-400 uppercase tracking-widest mb-1 transition-colors">Canceled</p>
-                <h3 id="stat-canceled" class="text-2xl font-black text-red-400 leading-none">{{ stats.canceled }}</h3>
-            </div>
-            <div onclick="switchTab('analytics')" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm col-span-2 lg:col-span-1 cursor-pointer hover:border-navy transition-all group">
-                <p class="text-[9px] font-black text-slate-300 group-hover:text-navy uppercase tracking-widest mb-1 transition-colors">Revenue</p>
-                <h3 id="stat-revenue" class="text-2xl font-black text-navy leading-none">AED {{ stats.revenue }}</h3>
+    <nav
+        class="sticky top-0 z-[100] bg-white/80 border-b border-slate-100 px-8 py-4 flex justify-between items-center backdrop-blur-md">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-navy rounded-xl flex items-center justify-center text-white shadow-xl"><span
+                    class="material-symbols-outlined">monitoring</span></div>
+            <div>
+                <h1 class="text-lg font-black text-navy uppercase tracking-tighter leading-none">Liberty Live</h1>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Command Center v14</p>
             </div>
         </div>
 
-        <!-- Analytics Section -->
-        <div id="tab-analytics" class="content-section hidden space-y-8">
-            <div class="grid lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                    <h3 class="text-xs font-black text-navy uppercase mb-6">Revenue Trend</h3>
-                    <div class="h-64"><canvas id="revenueChart"></canvas></div>
+        <div class="flex items-center gap-4">
+            <div class="hidden lg:flex items-center gap-1 bg-slate-100 p-1 rounded-2xl">
+                <button onclick="switchTab('active')" id="btn-active"
+                    class="tab-active px-6 py-2 rounded-xl text-xs font-bold transition-all">Queue</button>
+                <button onclick="switchTab('done')" id="btn-done"
+                    class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Archive</button>
+                <button onclick="switchTab('canceled')" id="btn-canceled"
+                    class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Canceled</button>
+                <button onclick="switchTab('analytics')" id="btn-analytics"
+                    class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Analytics</button>
+                <button onclick="switchTab('catalog')" id="btn-catalog"
+                    class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">Catalog</button>
+                <button onclick="switchTab('system')" id="btn-system"
+                    class="px-6 py-2 rounded-xl text-xs font-bold text-slate-500 hover:text-navy transition-all">System</button>
+            </div>
+            <a href="{{ url_for('admin_logout') }}"
+                class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 hover:text-red-500 transition-all"><span
+                    class="material-symbols-outlined">logout</span></a>
+        </div>
+    </nav>
+
+    <main class="w-full max-w-[1700px] mx-auto px-8 lg:px-12 py-8 flex gap-8 min-h-[calc(100vh-80px)]">
+
+        <!-- LEFT SIDE: Main Content -->
+        <div id="main-content-flow" class="content-main space-y-8">
+
+            <!-- Live Stats Grid -->
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                <div onclick="switchTab('active')"
+                    class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all group">
+                    <p
+                        class="text-[9px] font-black text-slate-300 group-hover:text-navy uppercase tracking-widest mb-1 transition-colors">
+                        Total</p>
+                    <h3 id="stat-total" class="text-2xl font-black text-navy leading-none">{{ stats.total }}</h3>
+                </div>
+                <div onclick="switchTab('active')"
+                    class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all group">
+                    <p
+                        class="text-[9px] font-black text-slate-300 group-hover:text-orange-500 uppercase tracking-widest mb-1 transition-colors">
+                        Pending</p>
+                    <h3 id="stat-pending" class="text-2xl font-black text-orange-500 leading-none">{{ stats.pending }}
+                    </h3>
+                </div>
+                <div onclick="switchTab('done')"
+                    class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all group">
+                    <p
+                        class="text-[9px] font-black text-slate-300 group-hover:text-green-500 uppercase tracking-widest mb-1 transition-colors">
+                        Completed</p>
+                    <h3 id="stat-done" class="text-2xl font-black text-green-500 leading-none">{{ stats.done }}</h3>
+                </div>
+                <div onclick="switchTab('canceled')"
+                    class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm cursor-pointer hover:border-navy transition-all group">
+                    <p
+                        class="text-[9px] font-black text-slate-300 group-hover:text-red-400 uppercase tracking-widest mb-1 transition-colors">
+                        Canceled</p>
+                    <h3 id="stat-canceled" class="text-2xl font-black text-red-400 leading-none">{{ stats.canceled }}
+                    </h3>
+                </div>
+                <div onclick="switchTab('analytics')"
+                    class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm col-span-2 lg:col-span-1 cursor-pointer hover:border-navy transition-all group">
+                    <p
+                        class="text-[9px] font-black text-slate-300 group-hover:text-navy uppercase tracking-widest mb-1 transition-colors">
+                        Revenue</p>
+                    <h3 id="stat-revenue" class="text-2xl font-black text-navy leading-none">AED {{ stats.revenue }}
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="tab-analytics" class="content-section hidden space-y-8">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                        <h3 class="text-xs font-black text-navy uppercase mb-6">Revenue Trend</h3>
+                        <div class="h-64"><canvas id="revenueChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                        <h3 class="text-xs font-black text-navy uppercase mb-6">Vehicle Mix</h3>
+                        <div class="h-64"><canvas id="vehicleChart"></canvas></div>
+                    </div>
                 </div>
                 <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                    <h3 class="text-xs font-black text-navy uppercase mb-6">Vehicle Mix</h3>
-                    <div class="h-64"><canvas id="vehicleChart"></canvas></div>
+                    <h3 class="text-xs font-black text-navy uppercase mb-6">Service Performance</h3>
+                    <div class="h-80"><canvas id="serviceChart"></canvas></div>
                 </div>
             </div>
-            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                <h3 class="text-xs font-black text-navy uppercase mb-6">Service Performance</h3>
-                <div class="h-80"><canvas id="serviceChart"></canvas></div>
-            </div>
-        </div>
 
-        <!-- Dynamic List Containers -->
-        <div id="tab-active" class="content-section space-y-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black text-navy uppercase tracking-tighter leading-none">Live Queue</h2>
-                <button onclick="openBookingModal()" class="bg-navy text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:scale-105 transition-transform">Create Reservation</button>
-            </div>
-            <div id="active-table-container" class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden"></div>
-        </div>
-
-        <div id="tab-canceled" class="content-section hidden space-y-6">
-            <h2 class="text-2xl font-black text-navy uppercase tracking-tighter leading-none">Canceled History</h2>
-            <div id="canceled-table-container" class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden"></div>
-        </div>
-
-        <div id="tab-done" class="content-section hidden space-y-6">
-            <h2 class="text-2xl font-black text-navy uppercase tracking-tighter leading-none">Archived Orders</h2>
-            <div id="done-table-container" class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden"></div>
-        </div>
-
-        <div id="tab-catalog" class="content-section hidden space-y-8">
-             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-2xl font-black text-navy uppercase tracking-tighter">Service Catalog</h2>
-                <button onclick="openServiceModal()" class="bg-slate-100 text-navy px-6 py-3 rounded-xl font-bold text-[10px] uppercase">Add Vehicle</button>
-            </div>
-            <div class="grid md:grid-cols-3 gap-6">
-                {% for s in services %}
-                <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100">
-                    <div class="flex justify-between items-start mb-6">
-                        <h4 class="text-lg font-black text-navy uppercase tracking-tighter leading-tight">{{ s.vehicleType }}</h4>
-                        <div class="flex gap-2">
-                            <button onclick='editService(JSON.parse(this.dataset.service))' data-service='{{ s|tojson|safe }}' class="text-slate-300 hover:text-navy transition-colors"><span class="material-symbols-outlined text-sm">edit</span></button>
-                            <button onclick="deleteService('{{ s.id }}')" class="text-slate-300 hover:text-red-500 transition-colors"><span class="material-symbols-outlined text-sm">delete</span></button>
-                        </div>
-                    </div>
-                    <div class="space-y-3">
-                        {% for item in s.services %}
-                        <div class="flex justify-between items-center text-[11px] font-bold text-slate-400">
-                            <span class="uppercase tracking-widest">{{ item.name }}</span>
-                            <span class="text-navy font-black">AED {{ item.price }}</span>
-                        </div>
-                        {% endfor %}
-                    </div>
+            <!-- Dynamic List Containers -->
+            <div id="tab-active" class="content-section space-y-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-black text-navy uppercase tracking-tighter leading-none">Live Queue</h2>
+                    <button onclick="openBookingModal()"
+                        class="bg-navy text-white px-6 py-3 rounded-xl font-bold text-[10px] uppercase shadow-lg hover:scale-105 transition-transform">Create
+                        Reservation</button>
                 </div>
-                {% endfor %}
+                <div id="active-table-container"
+                    class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden"></div>
             </div>
-        </div>
 
-        <div id="tab-system" class="content-section hidden">
-            <div class="grid lg:grid-cols-2 gap-12 pt-8">
-                <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
-                    <h2 class="text-xl font-black text-navy uppercase mb-8">Business Timings</h2>
-                    <form id="timings-form" class="space-y-6">
-                        <div id="timing-rows" class="grid grid-cols-2 gap-4 max-h-60 overflow-y-auto no-scrollbar">
-                            {% for t in timings %}
-                            <div class="flex gap-2 items-center bg-slate-50 p-2 rounded-xl">
-                                <input type="text" value="{{ t }}" required class="flex-1 bg-transparent border-none font-bold text-navy text-xs uppercase">
-                                <button type="button" onclick="this.parentElement.remove()" class="text-red-300 hover:text-red-500"><span class="material-symbols-outlined text-sm">remove</span></button>
+            <div id="tab-canceled" class="content-section hidden space-y-6">
+                <h2 class="text-2xl font-black text-navy uppercase tracking-tighter leading-none">Canceled History</h2>
+                <div id="canceled-table-container"
+                    class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden"></div>
+            </div>
+
+            <div id="tab-done" class="content-section hidden space-y-6">
+                <h2 class="text-2xl font-black text-navy uppercase tracking-tighter leading-none">Archived Orders</h2>
+                <div id="done-table-container"
+                    class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden"></div>
+            </div>
+
+            <div id="tab-catalog" class="content-section hidden space-y-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-black text-navy uppercase tracking-tighter">Service Catalog</h2>
+                    <button onclick="openServiceModal()"
+                        class="bg-slate-100 text-navy px-6 py-3 rounded-xl font-bold text-[10px] uppercase">Add
+                        Vehicle</button>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    {% for s in services %}
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100">
+                        <div class="flex justify-between items-start mb-6">
+                            <h4 class="text-lg font-black text-navy uppercase tracking-tighter leading-tight">{{
+                                s.vehicleType }}</h4>
+                            <div class="flex gap-2">
+                                <button onclick='editService(JSON.parse(this.dataset.service))'
+                                    data-service='{{ s|tojson|safe }}'
+                                    class="text-slate-300 hover:text-navy transition-colors"><span
+                                        class="material-symbols-outlined text-sm">edit</span></button>
+                                <button onclick="deleteService('{{ s.id }}')"
+                                    class="text-slate-300 hover:text-red-500 transition-colors"><span
+                                        class="material-symbols-outlined text-sm">delete</span></button>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            {% for item in s.services %}
+                            <div class="flex justify-between items-center text-[11px] font-bold text-slate-400">
+                                <span class="uppercase tracking-widest">{{ item.name }}</span>
+                                <span class="text-navy font-black">AED {{ item.price }}</span>
                             </div>
                             {% endfor %}
                         </div>
-                        <button type="submit" class="w-full py-4 rounded-xl bg-navy text-white font-black uppercase text-[10px] tracking-widest">Update Schedule</button>
-                    </form>
+                    </div>
+                    {% endfor %}
                 </div>
-                <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
-                    <h2 class="text-xl font-black text-navy uppercase mb-8">User Directory</h2>
-                    <div class="space-y-4 mb-8">
-                        {% for admin in admins %}
-                        <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">
-                            <span class="font-bold text-navy text-sm">{{ admin.username }}</span>
-                            <button onclick='editAdmin(JSON.parse(this.dataset.admin))' data-admin='{{ admin|tojson|safe }}' class="text-slate-300 hover:text-navy"><span class="material-symbols-outlined text-sm">edit</span></button>
+            </div>
+
+            <div id="tab-system" class="content-section hidden">
+                <div class="grid lg:grid-cols-2 gap-12 pt-8">
+                    <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
+                        <h2 class="text-xl font-black text-navy uppercase mb-8">Business Timings</h2>
+                        <form id="timings-form" class="space-y-6">
+                            <div id="timing-rows" class="grid grid-cols-2 gap-4 max-h-60 overflow-y-auto no-scrollbar">
+                                {% for t in timings %}
+                                <div class="flex gap-2 items-center bg-slate-50 p-2 rounded-xl">
+                                    <input type="text" value="{{ t }}" required
+                                        class="flex-1 bg-transparent border-none font-bold text-navy text-xs uppercase">
+                                    <button type="button" onclick="this.parentElement.remove()"
+                                        class="text-red-300 hover:text-red-500"><span
+                                            class="material-symbols-outlined text-sm">remove</span></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <button type="submit"
+                                class="w-full py-4 rounded-xl bg-navy text-white font-black uppercase text-[10px] tracking-widest">Update
+                                Schedule</button>
+                        </form>
+                    </div>
+                    <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
+                        <h2 class="text-xl font-black text-navy uppercase mb-8">User Directory</h2>
+                        <div class="space-y-4 mb-8">
+                            {% for admin in admins %}
+                            <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl">
+                                <span class="font-bold text-navy text-sm">{{ admin.username }}</span>
+                                <button onclick='editAdmin(JSON.parse(this.dataset.admin))'
+                                    data-admin='{{ admin|tojson|safe }}' class="text-slate-300 hover:text-navy"><span
+                                        class="material-symbols-outlined text-sm">edit</span></button>
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
-                    </div>
-                    <button onclick="openAdminModal()" class="w-full py-4 rounded-xl bg-slate-100 text-navy font-black uppercase text-[10px] tracking-widest">+ New Administrator</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- RIGHT SIDE: Integrated Details Panel -->
-    <div id="details-panel" class="sticky top-24 self-start bg-white rounded-[2.5rem] border border-slate-100 shadow-xl max-h-[calc(100vh-120px)] overflow-hidden flex flex-col">
-        <!-- Panel Header -->
-        <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20 backdrop-blur-md">
-            <div>
-                <p id="det-status" class="text-[9px] font-black text-aqua uppercase tracking-[0.2em] mb-1">Status</p>
-                <h3 id="det-name" class="text-2xl font-black text-navy uppercase tracking-tighter leading-none">Customer</h3>
-            </div>
-            <button onclick="closeDetails()" class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all"><span class="material-symbols-outlined text-lg">close</span></button>
-        </div>
-
-        <!-- Panel Body -->
-        <div class="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar">
-            <section class="space-y-4">
-                <h4 class="text-[9px] font-black text-navy uppercase tracking-widest">Contact Profile</h4>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-slate-50 p-5 rounded-2xl"><p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Email</p><p id="det-email" class="font-bold text-navy text-[11px] truncate">---</p></div>
-                    <div class="bg-slate-50 p-5 rounded-2xl"><p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Phone</p><p id="det-phone" class="font-bold text-navy text-[11px]">---</p></div>
-                </div>
-                <div class="bg-slate-50 p-5 rounded-2xl"><p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Address/Notes</p><p id="det-address" class="font-bold text-navy text-[11px]">---</p></div>
-            </section>
-
-            <section class="space-y-4">
-                <h4 class="text-[9px] font-black text-navy uppercase tracking-widest">Service Breakdown</h4>
-                <div class="bg-navy p-6 rounded-[2rem] text-white">
-                    <p id="det-vehicle" class="text-sm font-black uppercase mb-1">Vehicle</p>
-                    <p id="det-service" class="text-aqua font-bold uppercase text-[10px] tracking-widest mb-6">Service Type</p>
-                    <div class="flex justify-between items-end border-t border-white/10 pt-4">
-                        <div><p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Fee</p><p id="det-price" class="text-xl font-black">AED 0.00</p></div>
-                        <div class="text-right"><p id="det-date" class="text-[9px] font-black">---</p><p id="det-time" class="text-[9px] font-bold text-slate-400 uppercase">---</p></div>
+                        <button onclick="openAdminModal()"
+                            class="w-full py-4 rounded-xl bg-slate-100 text-navy font-black uppercase text-[10px] tracking-widest">+
+                            New Administrator</button>
                     </div>
                 </div>
-            </section>
+            </div>
+
         </div>
 
-        <!-- Panel Footer -->
-        <div id="panel-actions" class="p-8 border-t border-slate-50 bg-white flex gap-3">
-            <button id="btn-done-panel" class="flex-1 py-4 rounded-xl bg-green-500 text-white font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-lg hidden">Completed</button>
-            <button id="btn-cancel-panel" class="flex-1 py-4 rounded-xl bg-red-50 text-red-500 font-black uppercase text-[10px] tracking-widest hover:bg-red-500 hover:text-white transition-all hidden">Cancel</button>
+        <!-- RIGHT SIDE: Integrated Details Panel -->
+        <div id="details-panel"
+            class="sticky top-24 self-start bg-white rounded-[2.5rem] border border-slate-100 shadow-xl max-h-[calc(100vh-120px)] overflow-hidden flex flex-col">
+            <!-- Panel Header -->
+            <div class="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/20 backdrop-blur-md">
+                <div>
+                    <p id="det-status" class="text-[9px] font-black text-aqua uppercase tracking-[0.2em] mb-1">Status
+                    </p>
+                    <h3 id="det-name" class="text-2xl font-black text-navy uppercase tracking-tighter leading-none">
+                        Customer</h3>
+                </div>
+                <button onclick="closeDetails()"
+                    class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all"><span
+                        class="material-symbols-outlined text-lg">close</span></button>
+            </div>
+
+            <!-- Panel Body -->
+            <div class="flex-1 overflow-y-auto p-8 space-y-10 no-scrollbar">
+                <section class="space-y-4">
+                    <h4 class="text-[9px] font-black text-navy uppercase tracking-widest">Contact Profile</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-50 p-5 rounded-2xl">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Email</p>
+                            <p id="det-email" class="font-bold text-navy text-[11px] truncate">---</p>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-2xl">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Phone</p>
+                            <p id="det-phone" class="font-bold text-navy text-[11px]">---</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-5 rounded-2xl">
+                        <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Address/Notes</p>
+                        <p id="det-address" class="font-bold text-navy text-[11px]">---</p>
+                    </div>
+                </section>
+
+                <section class="space-y-4">
+                    <h4 class="text-[9px] font-black text-navy uppercase tracking-widest">Service Breakdown</h4>
+                    <div class="bg-navy p-6 rounded-[2rem] text-white">
+                        <p id="det-vehicle" class="text-sm font-black uppercase mb-1">Vehicle</p>
+                        <p id="det-service" class="text-aqua font-bold uppercase text-[10px] tracking-widest mb-6">
+                            Service Type</p>
+                        <div class="flex justify-between items-end border-t border-white/10 pt-4">
+                            <div>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase mb-1">Fee</p>
+                                <p id="det-price" class="text-xl font-black">AED 0.00</p>
+                            </div>
+                            <div class="text-right">
+                                <p id="det-date" class="text-[9px] font-black">---</p>
+                                <p id="det-time" class="text-[9px] font-bold text-slate-400 uppercase">---</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Panel Footer -->
+            <div id="panel-actions" class="p-8 border-t border-slate-50 bg-white flex gap-3">
+                <button id="btn-done-panel"
+                    class="flex-1 py-4 rounded-xl bg-green-500 text-white font-black uppercase text-[10px] tracking-widest hover:scale-105 transition-all shadow-lg hidden">Completed</button>
+                <button id="btn-cancel-panel"
+                    class="flex-1 py-4 rounded-xl bg-red-50 text-red-500 font-black uppercase text-[10px] tracking-widest hover:bg-red-500 hover:text-white transition-all hidden">Cancel</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Backdrops & Modals -->
+    <div id="overlay"
+        class="fixed inset-0 z-[200] hidden bg-navy/80 backdrop-blur-md flex items-center justify-center p-6"
+        onclick="closeAllModals()">
+        <div id="booking-modal"
+            class="bg-white w-full max-w-xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300"
+            onclick="event.stopPropagation()">
+            <h3 class="text-2xl font-black text-navy uppercase mb-8">Manual Entry</h3>
+            <form id="admin-booking-form" class="space-y-6">
+                <input type="text" id="mb-name" required placeholder="Name"
+                    class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                <input type="tel" id="mb-phone" required placeholder="Phone"
+                    class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                <div class="grid grid-cols-2 gap-4"><select id="mb-vehicle" required
+                        class="w-full px-6 py-4 rounded-xl bg-slate-50 font-bold text-navy"></select><select
+                        id="mb-service" required
+                        class="w-full px-6 py-4 rounded-xl bg-slate-50 font-bold text-navy"></select></div>
+                <div class="grid grid-cols-2 gap-4"><input type="date" id="mb-date" required
+                        class="w-full px-6 py-4 rounded-xl bg-slate-50 font-bold text-navy"><select id="mb-time"
+                        required class="w-full px-6 py-4 rounded-xl bg-slate-50 font-bold text-navy"></select></div>
+                <div class="flex justify-between items-center pt-6">
+                    <div id="mb-price" class="text-3xl font-black text-navy">AED 0.00</div><button type="submit"
+                        class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Authorize</button>
+                </div>
+            </form>
         </div>
     </div>
-</main>
 
-<!-- Backdrops & Modals -->
-<div id="overlay" class="fixed inset-0 z-[200] hidden bg-navy/80 backdrop-blur-md flex items-center justify-center p-6" onclick="closeAllModals()">
-    <div id="booking-modal" class="bg-white w-full max-w-xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
-        <h3 class="text-2xl font-black text-navy uppercase mb-8">Manual Entry</h3>
-        <form id="admin-booking-form" class="space-y-6">
-            <input type="text" id="mb-name" required placeholder="Name" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
-            <input type="tel" id="mb-phone" required placeholder="Phone" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
-            <div class="grid grid-cols-2 gap-4"><select id="mb-vehicle" required class="w-full px-6 py-4 rounded-xl bg-slate-50 font-bold text-navy"></select><select id="mb-service" required class="w-full px-6 py-4 rounded-xl bg-slate-50 font-bold text-navy"></select></div>
-            <div class="grid grid-cols-2 gap-4"><input type="date" id="mb-date" required class="w-full px-6 py-4 rounded-xl bg-slate-50 font-bold text-navy"><select id="mb-time" required class="w-full px-6 py-4 rounded-xl bg-slate-50 font-bold text-navy"></select></div>
-            <div class="flex justify-between items-center pt-6"><div id="mb-price" class="text-3xl font-black text-navy">AED 0.00</div><button type="submit" class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Authorize</button></div>
-        </form>
-    </div>
-</div>
+    <div id="services-data" class="hidden" data-services='{{ services|tojson|safe }}'></div>
+    <div id="timings-data" class="hidden" data-timings='{{ timings|tojson|safe }}'></div>
 
-<div id="services-data" class="hidden" data-services='{{ services|tojson|safe }}'></div>
-<div id="timings-data" class="hidden" data-timings='{{ timings|tojson|safe }}'></div>
+    <script>
+        const servicesData = JSON.parse(document.getElementById('services-data').dataset.services);
+        const timingsData = JSON.parse(document.getElementById('timings-data').dataset.timings);
+        let allBookings = [];
+        let knownBookingIds = new Set();
+        let charts = {};
+        let currentTab = 'active';
 
-<script>
-    const servicesData = JSON.parse(document.getElementById('services-data').dataset.services);
-    const timingsData = JSON.parse(document.getElementById('timings-data').dataset.timings);
-    let allBookings = [];
-    let knownBookingIds = new Set();
-    let charts = {};
-    let currentTab = 'active';
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('tab-active'));
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).classList.add('tab-active');
+            if (tab === 'analytics') setTimeout(initCharts, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-    function switchTab(tab) {
-        currentTab = tab;
-        document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
-        document.querySelectorAll('nav button').forEach(el => el.classList.remove('tab-active'));
-        document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        document.getElementById(`btn-${tab}`).classList.add('tab-active');
-        if(tab === 'analytics') setTimeout(initCharts, 0);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+        async function syncData() {
+            try {
+                const res = await fetch('/api/admin/dashboard/data');
+                const data = await res.json();
+                const s = data.stats;
+                document.getElementById('stat-total').innerText = s.total;
+                document.getElementById('stat-pending').innerText = s.pending;
+                document.getElementById('stat-done').innerText = s.done;
+                document.getElementById('stat-canceled').innerText = s.canceled;
+                document.getElementById('stat-revenue').innerText = s.revenue;
+                const newNames = data.bookings.filter(b => !knownBookingIds.has(b.id));
+                if (knownBookingIds.size > 0 && newNames.length > 0) newNames.forEach(showToast);
+                newNames.forEach(b => knownBookingIds.add(b.id));
+                allBookings = data.bookings;
+                renderTables();
+                if (currentTab === 'analytics') initCharts();
+            } catch (e) { console.error(e); }
+        }
 
-    async function syncData() {
-        try {
-            const res = await fetch('/api/admin/dashboard/data');
-            const data = await res.json();
-            const s = data.stats;
-            document.getElementById('stat-total').innerText = s.total;
-            document.getElementById('stat-pending').innerText = s.pending;
-            document.getElementById('stat-done').innerText = s.done;
-            document.getElementById('stat-canceled').innerText = s.canceled;
-            document.getElementById('stat-revenue').innerText = s.revenue;
-            const newNames = data.bookings.filter(b => !knownBookingIds.has(b.id));
-            if(knownBookingIds.size > 0 && newNames.length > 0) newNames.forEach(showToast);
-            newNames.forEach(b => knownBookingIds.add(b.id));
-            allBookings = data.bookings;
-            renderTables();
-            if(currentTab === 'analytics') initCharts();
-        } catch(e) { console.error(e); }
-    }
+        function showToast(b) {
+            const t = document.createElement('div');
+            t.className = "toast bg-white p-6 rounded-2xl shadow-xl border-l-4 border-aqua flex gap-4 items-center pointer-events-auto w-80";
+            t.innerHTML = `<div class="w-10 h-10 rounded-full bg-aqua/10 flex items-center justify-center text-aqua"><span class="material-symbols-outlined">notifications_active</span></div><div><p class="text-[10px] font-black text-navy uppercase">New Reservation</p><p class="text-[10px] font-bold text-slate-500">${b.fullName}</p></div>`;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(() => t.remove(), 5000);
+        }
 
-    function showToast(b) {
-        const t = document.createElement('div');
-        t.className = "toast bg-white p-6 rounded-2xl shadow-xl border-l-4 border-aqua flex gap-4 items-center pointer-events-auto w-80";
-        t.innerHTML = `<div class="w-10 h-10 rounded-full bg-aqua/10 flex items-center justify-center text-aqua"><span class="material-symbols-outlined">notifications_active</span></div><div><p class="text-[10px] font-black text-navy uppercase">New Reservation</p><p class="text-[10px] font-bold text-slate-500">${b.fullName}</p></div>`;
-        document.getElementById('toast-container').appendChild(t);
-        setTimeout(() => t.remove(), 5000);
-    }
-
-    function renderTables() {
-        const render = (list, target) => {
-            const container = document.getElementById(target);
-            if(!container) return;
-            if(!list.length) { container.innerHTML = '<div class="p-12 text-center text-slate-300 font-bold uppercase text-[10px]">Empty</div>'; return; }
-            container.innerHTML = `<table class="w-full text-left"><thead class="bg-slate-50/50 border-b border-slate-100"><tr><th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Customer</th><th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Service</th><th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Fee</th><th class="px-8 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-widest">Actions</th></tr></thead><tbody class="divide-y divide-slate-50">${list.map(b => `
+        function renderTables() {
+            const render = (list, target) => {
+                const container = document.getElementById(target);
+                if (!container) return;
+                if (!list.length) { container.innerHTML = '<div class="p-12 text-center text-slate-300 font-bold uppercase text-[10px]">Empty</div>'; return; }
+                container.innerHTML = `<table class="w-full text-left"><thead class="bg-slate-50/50 border-b border-slate-100"><tr><th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Customer</th><th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Service</th><th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Fee</th><th class="px-8 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-widest">Actions</th></tr></thead><tbody class="divide-y divide-slate-50">${list.map(b => `
                 <tr class="hover:bg-slate-50/50 transition-colors cursor-pointer group" onclick="showBookingDetails('${b.id}')">
                     <td class="px-8 py-5"><p class="font-bold text-navy text-sm group-hover:text-aqua transition-colors">${b.fullName}</p><p class="text-[9px] text-slate-400 font-bold uppercase">${b.preferredDate}</p></td>
                     <td class="px-6 py-5 uppercase text-[10px] font-black text-slate-400">${b.vehicleType}</td>
@@ -314,107 +375,108 @@
                         ${b.status === 'pending' ? `<button onclick="markStatus('${b.id}', 'done')" class="w-8 h-8 rounded-lg bg-green-50 text-green-500 hover:bg-green-500 hover:text-white transition-all"><span class="material-symbols-outlined text-sm">check</span></button><button onclick="markStatus('${b.id}', 'canceled')" class="w-8 h-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all"><span class="material-symbols-outlined text-sm">close</span></button>` : `<span class="text-[9px] font-black uppercase text-slate-300">${b.status}</span>`}
                     </td>
                 </tr>`).join('')}</tbody></table>`;
+            };
+            render(allBookings.filter(b => b.status === 'pending'), 'active-table-container');
+            render(allBookings.filter(b => b.status === 'done'), 'done-table-container');
+            render(allBookings.filter(b => b.status === 'canceled'), 'canceled-table-container');
+        }
+
+        function showBookingDetails(id) {
+            const b = allBookings.find(x => x.id === id);
+            if (!b) return;
+            document.getElementById('det-status').innerText = b.status;
+            document.getElementById('det-name').innerText = b.fullName;
+            document.getElementById('det-email').innerText = b.email || 'Private';
+            document.getElementById('det-phone').innerText = b.phone;
+            document.getElementById('det-address').innerText = b.address || 'Standard Reservation';
+            document.getElementById('det-vehicle').innerText = b.vehicleType;
+            document.getElementById('det-service').innerText = b.serviceType;
+            document.getElementById('det-time').innerText = b.preferredTime;
+            document.getElementById('det-date').innerText = b.preferredDate;
+            document.getElementById('det-price').innerText = 'AED ' + b.totalCost;
+
+            const bD = document.getElementById('btn-done-panel');
+            const bC = document.getElementById('btn-cancel-panel');
+            if (b.status === 'pending') {
+                bD.classList.remove('hidden'); bC.classList.remove('hidden');
+                bD.onclick = () => markStatus(b.id, 'done');
+                bC.onclick = () => markStatus(b.id, 'canceled');
+            } else { bD.classList.add('hidden'); bC.classList.add('hidden'); }
+
+            const flow = document.getElementById('main-content-flow');
+            const panel = document.getElementById('details-panel');
+            flow.classList.add('content-split');
+            panel.classList.add('panel-active');
+            if (currentTab === 'analytics') setTimeout(initCharts, 600);
+        }
+
+        function closeDetails() {
+            document.getElementById('main-content-flow').classList.remove('content-split');
+            document.getElementById('details-panel').classList.remove('panel-active');
+            if (currentTab === 'analytics') setTimeout(initCharts, 600);
+        }
+
+        function closeAllModals() {
+            document.getElementById('overlay').classList.add('hidden');
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        function initCharts() {
+            const ctxRev = document.getElementById('revenueChart').getContext('2d');
+            const ctxVeh = document.getElementById('vehicleChart').getContext('2d');
+            const ctxSer = document.getElementById('serviceChart').getContext('2d');
+            if (charts.revenue) { charts.revenue.destroy(); charts.vehicle.destroy(); charts.service.destroy(); }
+            const last7Days = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0]; }).reverse();
+            const revData = last7Days.map(date => { return allBookings.filter(b => b.status === 'done' && b.preferredDate === date).reduce((sum, b) => sum + parseFloat(b.totalCost || 0), 0); });
+            const vehDistribution = {}; allBookings.forEach(b => vehDistribution[b.vehicleType] = (vehDistribution[b.vehicleType] || 0) + 1);
+            const serDistribution = {}; allBookings.forEach(b => serDistribution[b.serviceType] = (serDistribution[b.serviceType] || 0) + 1);
+            charts.revenue = new Chart(ctxRev, { type: 'line', data: { labels: last7Days, datasets: [{ label: 'Revenue', data: revData, borderColor: '#40B8D5', backgroundColor: 'rgba(64, 184, 213, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+            charts.vehicle = new Chart(ctxVeh, { type: 'doughnut', data: { labels: Object.keys(vehDistribution), datasets: [{ data: Object.values(vehDistribution), backgroundColor: ['#082866', '#40B8D5', '#CBD5E1', '#F1F5F9', '#1E293B'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } } } } });
+            charts.service = new Chart(ctxSer, { type: 'bar', data: { labels: Object.keys(serDistribution), datasets: [{ label: 'Orders', data: Object.values(serDistribution), backgroundColor: '#082866', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+        }
+
+        async function markStatus(id, status) {
+            if (!confirm(`Mark as ${status}?`)) return;
+            const res = await fetch(`/api/admin/bookings/${id}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) });
+            if (res.ok) { closeDetails(); syncData(); }
+        }
+
+        function openBookingModal() { populateManualDropdowns(); document.getElementById('overlay').classList.remove('hidden'); document.getElementById('booking-modal').classList.remove('hidden'); }
+        function populateManualDropdowns() {
+            const vS = document.getElementById('mb-vehicle');
+            const tS = document.getElementById('mb-time');
+            vS.innerHTML = servicesData.map(s => `<option value="${s.vehicleType}">${s.vehicleType}</option>`).join('');
+            tS.innerHTML = timingsData.map(t => `<option value="${t}">${t}</option>`).join('');
+            updateManualPrice();
+        }
+        document.getElementById('mb-vehicle').onchange = updateManualPrice;
+        document.getElementById('mb-service').onchange = () => {
+            const p = document.getElementById('mb-service').selectedOptions[0].dataset.price;
+            document.getElementById('mb-price').textContent = `AED ${parseFloat(p).toFixed(2)}`;
         };
-        render(allBookings.filter(b => b.status === 'pending'), 'active-table-container');
-        render(allBookings.filter(b => b.status === 'done'), 'done-table-container');
-        render(allBookings.filter(b => b.status === 'canceled'), 'canceled-table-container');
-    }
+        function updateManualPrice() {
+            const v = servicesData.find(s => s.vehicleType === document.getElementById('mb-vehicle').value);
+            const sS = document.getElementById('mb-service');
+            sS.innerHTML = v.services.map(s => `<option value="${s.name}" data-price="${s.price}">${s.name}</option>`).join('');
+            document.getElementById('mb-price').textContent = `AED ${parseFloat(v.services[0].price).toFixed(2)}`;
+        }
+        document.getElementById('admin-booking-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const data = { fullName: document.getElementById('mb-name').value, phone: document.getElementById('mb-phone').value, vehicleType: document.getElementById('mb-vehicle').value, serviceType: document.getElementById('mb-service').value, totalCost: parseFloat(document.getElementById('mb-service').selectedOptions[0].dataset.price), preferredDate: document.getElementById('mb-date').value, preferredTime: document.getElementById('mb-time').value, bookingType: 'Manual Entry' };
+            await fetch('/api/admin/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+            closeAllModals(); syncData();
+        };
 
-    function showBookingDetails(id) {
-        const b = allBookings.find(x => x.id === id);
-        if(!b) return;
-        document.getElementById('det-status').innerText = b.status;
-        document.getElementById('det-name').innerText = b.fullName;
-        document.getElementById('det-email').innerText = b.email || 'Private';
-        document.getElementById('det-phone').innerText = b.phone;
-        document.getElementById('det-address').innerText = b.address || 'Standard Reservation';
-        document.getElementById('det-vehicle').innerText = b.vehicleType;
-        document.getElementById('det-service').innerText = b.serviceType;
-        document.getElementById('det-time').innerText = b.preferredTime;
-        document.getElementById('det-date').innerText = b.preferredDate;
-        document.getElementById('det-price').innerText = 'AED ' + b.totalCost;
-        
-        const bD = document.getElementById('btn-done-panel');
-        const bC = document.getElementById('btn-cancel-panel');
-        if(b.status === 'pending') {
-            bD.classList.remove('hidden'); bC.classList.remove('hidden');
-            bD.onclick = () => markStatus(b.id, 'done');
-            bC.onclick = () => markStatus(b.id, 'canceled');
-        } else { bD.classList.add('hidden'); bC.classList.add('hidden'); }
-
-        const flow = document.getElementById('main-content-flow');
-        const panel = document.getElementById('details-panel');
-        flow.classList.add('content-split');
-        panel.classList.add('panel-active');
-        if(currentTab === 'analytics') setTimeout(initCharts, 600);
-    }
-
-    function closeDetails() {
-        document.getElementById('main-content-flow').classList.remove('content-split');
-        document.getElementById('details-panel').classList.remove('panel-active');
-        if(currentTab === 'analytics') setTimeout(initCharts, 600);
-    }
-
-    function closeAllModals() {
-        document.getElementById('overlay').classList.add('hidden');
-        document.getElementById('booking-modal').classList.add('hidden');
-    }
-
-    function initCharts() {
-        const ctxRev = document.getElementById('revenueChart').getContext('2d');
-        const ctxVeh = document.getElementById('vehicleChart').getContext('2d');
-        const ctxSer = document.getElementById('serviceChart').getContext('2d');
-        if(charts.revenue) { charts.revenue.destroy(); charts.vehicle.destroy(); charts.service.destroy(); }
-        const last7Days = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().split('T')[0]; }).reverse();
-        const revData = last7Days.map(date => { return allBookings.filter(b => b.status === 'done' && b.preferredDate === date).reduce((sum, b) => sum + parseFloat(b.totalCost || 0), 0); });
-        const vehDistribution = {}; allBookings.forEach(b => vehDistribution[b.vehicleType] = (vehDistribution[b.vehicleType] || 0) + 1);
-        const serDistribution = {}; allBookings.forEach(b => serDistribution[b.serviceType] = (serDistribution[b.serviceType] || 0) + 1);
-        charts.revenue = new Chart(ctxRev, { type: 'line', data: { labels: last7Days, datasets: [{ label: 'Revenue', data: revData, borderColor: '#40B8D5', backgroundColor: 'rgba(64, 184, 213, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-        charts.vehicle = new Chart(ctxVeh, { type: 'doughnut', data: { labels: Object.keys(vehDistribution), datasets: [{ data: Object.values(vehDistribution), backgroundColor: ['#082866', '#40B8D5', '#CBD5E1', '#F1F5F9', '#1E293B'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9, weight: 'bold' } } } } } });
-        charts.service = new Chart(ctxSer, { type: 'bar', data: { labels: Object.keys(serDistribution), datasets: [{ label: 'Orders', data: Object.values(serDistribution), backgroundColor: '#082866', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-    }
-
-    async function markStatus(id, status) {
-        if (!confirm(`Mark as ${status}?`)) return;
-        const res = await fetch(`/api/admin/bookings/${id}/status`, { method: 'PATCH', headers: {'Content-Type':'application/json'}, body: JSON.stringify({status})});
-        if (res.ok) { closeDetails(); syncData(); }
-    }
-
-    function openBookingModal() { populateManualDropdowns(); document.getElementById('overlay').classList.remove('hidden'); document.getElementById('booking-modal').classList.remove('hidden'); }
-    function populateManualDropdowns() {
-        const vS = document.getElementById('mb-vehicle');
-        const tS = document.getElementById('mb-time');
-        vS.innerHTML = servicesData.map(s => `<option value="${s.vehicleType}">${s.vehicleType}</option>`).join('');
-        tS.innerHTML = timingsData.map(t => `<option value="${t}">${t}</option>`).join('');
-        updateManualPrice();
-    }
-    document.getElementById('mb-vehicle').onchange = updateManualPrice;
-    document.getElementById('mb-service').onchange = () => {
-        const p = document.getElementById('mb-service').selectedOptions[0].dataset.price;
-        document.getElementById('mb-price').textContent = `AED ${parseFloat(p).toFixed(2)}`;
-    };
-    function updateManualPrice() {
-        const v = servicesData.find(s => s.vehicleType === document.getElementById('mb-vehicle').value);
-        const sS = document.getElementById('mb-service');
-        sS.innerHTML = v.services.map(s => `<option value="${s.name}" data-price="${s.price}">${s.name}</option>`).join('');
-        document.getElementById('mb-price').textContent = `AED ${parseFloat(v.services[0].price).toFixed(2)}`;
-    }
-    document.getElementById('admin-booking-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const data = { fullName: document.getElementById('mb-name').value, phone: document.getElementById('mb-phone').value, vehicleType: document.getElementById('mb-vehicle').value, serviceType: document.getElementById('mb-service').value, totalCost: parseFloat(document.getElementById('mb-service').selectedOptions[0].dataset.price), preferredDate: document.getElementById('mb-date').value, preferredTime: document.getElementById('mb-time').value, bookingType: 'Manual Entry' };
-        await fetch('/api/admin/bookings', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
-        closeAllModals(); syncData();
-    };
-
-    window.onload = () => {
-        {% for b in bookings %}
-        knownBookingIds.add('{{ b.id }}');
-        {% endfor %}
-        allBookings = {{ bookings|tojson|safe }};
-        renderTables();
-        setInterval(syncData, 15000);
-    };
-</script>
+        window.onload = () => {
+            {% for b in bookings %}
+            knownBookingIds.add('{{ b.id }}');
+            {% endfor %}
+            allBookings = {{ bookings | tojson | safe }};
+            renderTables();
+            setInterval(syncData, 15000);
+        };
+    </script>
 
 </body>
+
 </html>
