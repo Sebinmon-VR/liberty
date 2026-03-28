@@ -1,23 +1,589 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LibertyPlus Premium Auto Services UAE</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Use Montserrat for exact headers and Inter for exact body text -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Liberty Plus | Premium Automotive Care</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-secondary-container": "#006375",
+                "on-primary": "#ffffff",
+                "on-tertiary": "#ffffff",
+                "outline": "#757681",
+                "surface-bright": "#f2fbfc",
+                "primary-container": "#082866",
+                "secondary-fixed-dim": "#40B8D5",
+                "primary-fixed": "#dae1ff",
+                "on-error": "#ffffff",
+                "inverse-surface": "#293233",
+                "on-surface": "#151d1e",
+                "on-primary-container": "#dae1ff",
+                "surface-dim": "#d3dcdd",
+                "on-tertiary-fixed": "#360f00",
+                "on-surface-variant": "#444650",
+                "on-secondary": "#ffffff",
+                "on-secondary-fixed": "#001f27",
+                "on-primary-fixed": "#001849",
+                "surface-container": "#e7f0f1",
+                "on-tertiary-container": "#d37e59",
+                "primary": "#082866",
+                "secondary-container": "#40B8D5",
+                "surface-tint": "#082866",
+                "surface-variant": "#dbe4e5",
+                "surface-container-lowest": "#ffffff",
+                "inverse-primary": "#b3c5ff",
+                "secondary": "#40B8D5",
+                "surface-container-highest": "#dbe4e5",
+                "outline-variant": "#c5c6d2",
+                "surface-container-low": "#ecf5f6",
+                "secondary-fixed": "#afecff",
+                "surface": "#f2fbfc",
+                "tertiary": "#300c00",
+                "surface-container-high": "#e1eaeb",
+                "on-primary-fixed-variant": "#2b4482",
+                "tertiary-fixed": "#ffdbcd",
+                "on-background": "#151d1e",
+                "inverse-on-surface": "#e9f2f3",
+                "error": "#ba1a1a",
+                "tertiary-container": "#521a00",
+                "on-secondary-fixed-variant": "#004e5d",
+                "tertiary-fixed-dim": "#ffb598",
+                "on-error-container": "#93000a",
+                "primary-fixed-dim": "#b3c5ff",
+                "background": "#f2fbfc",
+                "on-tertiary-fixed-variant": "#753415",
+                "error-container": "#ffdad6",
+                "brand-navy": "#082866",
+                "brand-aqua": "#40B8D5"
+              },
+              fontFamily: {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Manrope"],
+                "label": ["Manrope"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hydro-gradient {
+            background: linear-gradient(135deg, #082866 0%, #001441 100%);
+        }
+        .aqua-gradient {
+            background: linear-gradient(180deg, #f2fbfc 0%, #e0f4f8 100%);
+        }
+        .aqua-accent-gradient {
+            background: linear-gradient(135deg, #40B8D5 0%, #082866 100%);
+        }
+        
+        /* Slider Styles */
+        .comparison-slider {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+            min-height: 500px;
+            overflow: hidden;
+            cursor: ew-resize;
+        }
+        .comparison-slider img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            user-select: none;
+            pointer-events: none;
+        }
+        .comparison-slider .after-image {
+            clip-path: inset(0 0 0 50%);
+        }
+        .slider-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: white;
+            z-index: 30;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #40B8D5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #082866;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+        .label-before, .label-after {
+            position: absolute;
+            bottom: 40px;
+            padding: 8px 24px;
+            background: rgba(8, 40, 102, 0.8);
+            color: white;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+            z-index: 20;
+            pointer-events: none;
+        }
+        .label-before { left: 40px; }
+        .label-after { right: 40px; }
+        
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(8,40,102,0.4) 0%, transparent 40%, transparent 60%, rgba(8,40,102,0.4) 100%);
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body>
-    <div id="sec-hero"></div>
-    <div id="sec-about"></div>
-    <div id="sec-booking"></div>
-    <div id="sec-services"></div>
-    <div id="sec-info"></div>
-    <div id="sec-gallery"></div>
-    <div id="sec-footer"></div>
-    <script src="assets/js/main.js"></script>
-</body>
-</html>
+<body class="bg-surface text-on-surface font-body antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-brand-navy/5 z-[100]">
+<div class="flex justify-between items-center px-8 py-3 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<img alt="Liberty Plus Logo" class="w-auto h-10" data-alt="Minimalist premium automotive logo featuring clean geometric lines in deep navy and aqua tones" src="assets/images/logo_liberty.png"/>
+<span class="text-2xl font-bold text-brand-navy uppercase tracking-wider font-headline">Liberty Plus</span>
+</div>
+<div class="hidden md:flex items-center gap-x-8">
+<a class="text-brand-aqua border-b-2 border-brand-aqua pb-1 font-headline font-bold tracking-tight" href="#home">Home</a>
+<a class="text-slate-600 hover:text-brand-navy transition-colors font-headline font-semibold tracking-tight" href="#about">About</a>
+<a class="text-slate-600 hover:text-brand-navy transition-colors font-headline font-semibold tracking-tight" href="#services">Services</a>
+<a class="text-slate-600 hover:text-brand-navy transition-colors font-headline font-semibold tracking-tight" href="#booking">Booking</a>
+</div>
+<a class="bg-brand-navy text-white px-6 py-2.5 rounded-full font-headline font-bold text-sm hover:bg-brand-aqua transition-colors shadow-md active:scale-95" href="#booking">Book Services</a>
+</div>
+</nav>
+<main>
+<!-- Hero Slider Section -->
+<section class="relative w-full bg-black overflow-hidden" id="home">
+<div class="comparison-slider" id="hero-slider">
+<!-- Before Image -->
+<img alt="Dirty SUV before cleaning" class="before-image" src="assets/images/dirty_car.jpg"/>
+<!-- After Image -->
+<img alt="Clean SUV after Liberty Plus service" class="after-image" src="assets/images/clean_car.jpg"/>
+<!-- Labels -->
+<div class="label-before">Before</div>
+<div class="label-after">After</div>
+<!-- Overlay for visual depth -->
+<div class="hero-overlay"></div>
+<!-- Slider Handle -->
+<div class="slider-handle">
+<div class="slider-button"><span class="material-symbols-outlined">swap_horiz</span></div>
+</div>
+<!-- Floating Hero Text Overlay -->
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center">
+<div class="text-white/70 font-headline font-normal text-2xl tracking-[0.4em] uppercase mb-2 text-center">Clean Car, Safe Hands</div>
+<a class="bg-secondary text-on-primary px-8 py-4 font-headline font-extrabold text-base hover:bg-primary transition-all shadow-xl shadow-secondary/20 active:scale-95 whitespace-nowrap inline-flex items-center gap-2 rounded-full" href="#booking">
+                        Book a Service
+                    </a>
+</div>
+</div>
+</section>
+<!-- About Section - Aqua Background -->
+<section class="py-24 aqua-gradient px-8 border-y border-brand-aqua/10" id="about">
+<div class="max-w-7xl mx-auto">
+<div class="grid md:grid-cols-2 gap-20 items-center">
+<div class="order-2 md:order-1">
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-4 pt-12">
+<div class="rounded-2xl overflow-hidden aspect-square shadow-lg border-2 border-white">
+<img alt="Automotive care supplies on shelves" class="w-full h-full object-cover" data-alt="Shelves stocked with various automotive oils, filters, and cleaning products" src="assets/images/about_supplies.jpg"/>
+</div>
+<div class="rounded-2xl overflow-hidden aspect-square shadow-lg border-2 border-white">
+<img alt="Car wash foam application" class="w-full h-full object-cover" data-alt="Close up of a car being sprayed with thick cleaning foam" src="assets/images/about_foam.jpg"/>
+</div>
+</div>
+<div class="space-y-4">
+<div class="rounded-2xl overflow-hidden aspect-square shadow-lg border-2 border-white">
+<img alt="Car in wash bay" class="w-full h-full object-cover" data-alt="A white car inside a professional automated or high-pressure wash bay" src="assets/images/about_wash_bay.jpg"/>
+</div>
+<div class="rounded-2xl overflow-hidden aspect-[4/5] shadow-lg border-2 border-white">
+<img alt="Professional mechanic inspecting engine" class="w-full h-full object-cover" data-alt="Detailed view of a professional mechanic working on a car engine with specialized tools." src="assets/images/about_mechanic.jpg"/>
+</div>
+</div>
+</div>
+</div>
+<div class="order-1 md:order-2 space-y-8">
+<div class="flex items-center gap-3">
+<div class="h-[2px] w-12 bg-brand-aqua"></div>
+<h2 class="text-xs font-bold tracking-[0.3em] uppercase text-brand-aqua">Our Values</h2>
+</div>
+<h3 class="text-4xl md:text-5xl font-headline font-bold text-brand-navy">About Liberty Plus</h3>
+<div class="space-y-6 text-on-surface-variant text-lg leading-relaxed">
+<p>
+                                LIBERTYPLUS Auto Services is built on simple values. <span class="text-brand-navy font-bold">Good work. Honest service. Real care.</span> We clean every car with patience and detail.
+                            </p>
+<p>
+                                No rushing. No shortcuts. Just the right products and careful hands. Come in for a wash, any repair or maintenance. Leave with a car that looks better, feels smoother, and is ready for the road.
+                            </p>
+</div>
+<div class="pt-6 border-t border-brand-navy/10 flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-brand-navy flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-brand-aqua">handshake</span>
+</div>
+<div>
+<p class="font-bold text-brand-navy">Patience &amp; Precision</p>
+<p class="text-sm text-on-surface-variant">Our commitment to every vehicle.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Services Section -->
+<section class="py-24 px-8 bg-surface" id="services">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-20 space-y-4">
+<h2 class="text-xs font-bold tracking-[0.3em] uppercase text-brand-aqua">What We Do</h2>
+<h3 class="text-4xl md:text-5xl font-headline font-bold text-brand-navy">Precision Services</h3>
+<div class="w-24 h-1.5 bg-brand-aqua mx-auto rounded-full mt-4"></div>
+</div>
+<div class="grid md:grid-cols-2 gap-8 lg:grid-cols-3">
+<!-- Service 1 -->
+<div class="bg-white p-8 rounded-3xl group hover:bg-brand-navy transition-all duration-500 hover:-translate-y-2 border border-slate-100 shadow-sm hover:shadow-2xl">
+<div class="w-16 h-16 rounded-2xl bg-brand-aqua/10 flex items-center justify-center mb-8 group-hover:bg-brand-aqua transition-colors">
+<span class="material-symbols-outlined text-3xl text-brand-navy group-hover:text-white">waves</span>
+</div>
+<h4 class="text-xl font-bold font-headline text-brand-navy mb-4 group-hover:text-white">Hot Wash</h4>
+<p class="text-on-surface-variant group-hover:text-brand-aqua transition-colors">Steam-based cleaning that removes stubborn grime while preserving paint integrity.</p>
+</div>
+<!-- Service 2 -->
+<div class="bg-white p-8 rounded-3xl group hover:bg-brand-navy transition-all duration-500 hover:-translate-y-2 border border-slate-100 shadow-sm hover:shadow-2xl">
+<div class="w-16 h-16 rounded-2xl bg-brand-aqua/10 flex items-center justify-center mb-8 group-hover:bg-brand-aqua transition-colors">
+<span class="material-symbols-outlined text-3xl text-brand-navy group-hover:text-white">local_car_wash</span>
+</div>
+<h4 class="text-xl font-bold font-headline text-brand-navy mb-4 group-hover:text-white">Diesel Wash</h4>
+<p class="text-on-surface-variant group-hover:text-brand-aqua transition-colors">Heavy-duty chassis and engine bay degreasing for commercial and diesel vehicles.</p>
+</div>
+<!-- Service 3 -->
+<div class="bg-white p-8 rounded-3xl group hover:bg-brand-navy transition-all duration-500 hover:-translate-y-2 border border-slate-100 shadow-sm hover:shadow-2xl">
+<div class="w-16 h-16 rounded-2xl bg-brand-aqua/10 flex items-center justify-center mb-8 group-hover:bg-brand-aqua transition-colors">
+<span class="material-symbols-outlined text-3xl text-brand-navy group-hover:text-white">build</span>
+</div>
+<h4 class="text-xl font-bold font-headline text-brand-navy mb-4 group-hover:text-white">Mechanic Repair</h4>
+<p class="text-on-surface-variant group-hover:text-brand-aqua transition-colors">Expert diagnostics and repairs for all makes and models using premium spare parts.</p>
+</div>
+<!-- Service 4 -->
+<div class="bg-white p-8 rounded-3xl group hover:bg-brand-navy transition-all duration-500 hover:-translate-y-2 border border-slate-100 shadow-sm hover:shadow-2xl">
+<div class="w-16 h-16 rounded-2xl bg-brand-aqua/10 flex items-center justify-center mb-8 group-hover:bg-brand-aqua transition-colors">
+<span class="material-symbols-outlined text-3xl text-brand-navy group-hover:text-white">garage</span>
+</div>
+<h4 class="text-xl font-bold font-headline text-brand-navy mb-4 group-hover:text-white">Auto Garage</h4>
+<p class="text-on-surface-variant group-hover:text-brand-aqua transition-colors">Comprehensive vehicle checkups, tire rotations, and general automotive care.</p>
+</div>
+<!-- Service 5 -->
+<div class="bg-white p-8 rounded-3xl group hover:bg-brand-navy transition-all duration-500 hover:-translate-y-2 border border-slate-100 shadow-sm hover:shadow-2xl">
+<div class="w-16 h-16 rounded-2xl bg-brand-aqua/10 flex items-center justify-center mb-8 group-hover:bg-brand-aqua transition-colors">
+<span class="material-symbols-outlined text-3xl text-brand-navy group-hover:text-white">oil_barrel</span>
+</div>
+<h4 class="text-xl font-bold font-headline text-brand-navy mb-4 group-hover:text-white">Oil/Filter/Grease Change</h4>
+<p class="text-on-surface-variant group-hover:text-brand-aqua transition-colors">Expert oil, filter, and lubrication services to keep your engine running smoothly.</p>
+</div>
+<!-- Service 6 -->
+<div class="bg-white p-8 rounded-3xl group hover:bg-brand-navy transition-all duration-500 hover:-translate-y-2 border border-slate-100 shadow-sm hover:shadow-2xl">
+<div class="w-16 h-16 rounded-2xl bg-brand-aqua/10 flex items-center justify-center mb-8 group-hover:bg-brand-aqua transition-colors">
+<span class="material-symbols-outlined text-3xl text-brand-navy group-hover:text-white">settings</span>
+</div>
+<h4 class="text-xl font-bold font-headline text-brand-navy mb-4 group-hover:text-white">General Maintenance</h4>
+<p class="text-on-surface-variant group-hover:text-brand-aqua transition-colors">Routine checks and preventive care to extend the life of your vehicle and ensure safety.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Booking Section -->
+<section class="py-24 px-8 relative bg-brand-navy overflow-hidden" id="booking">
+<!-- Background Decoration -->
+<div class="absolute right-0 top-0 w-1/3 h-full bg-brand-aqua/10 -skew-x-12 transform translate-x-20"></div>
+<div class="absolute left-0 bottom-0 w-1/4 h-1/2 bg-white/5 rounded-full blur-3xl"></div>
+<div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+<div class="space-y-8 relative z-10">
+<h2 class="text-xs font-bold tracking-[0.3em] uppercase text-brand-aqua">Reserve Your Slot</h2>
+<h3 class="text-4xl md:text-5xl font-headline font-bold text-white">Schedule Your Visit</h3>
+<p class="text-lg text-slate-300 leading-relaxed">
+                        Ready for that premium feel? Fill out the form below and our team will prepare for your arrival. Quality service takes time, so we appreciate your booking.
+                    </p>
+<div class="flex items-start gap-6 pt-8">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-aqua flex items-center justify-center text-brand-navy shadow-lg">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div>
+<p class="font-bold text-white">Quick Response</p>
+<p class="text-slate-400">We confirm all bookings within 15 minutes of submission.</p>
+</div>
+</div>
+</div>
+<div class="bg-white p-10 rounded-[2.5rem] shadow-2xl relative z-10 border-t-8 border-brand-aqua">
+<div class="mb-8 text-center">
+<h4 class="text-2xl font-bold text-brand-navy">Appointment Details</h4>
+<p class="text-slate-500 text-sm mt-1">Tell us about your vehicle and required service</p>
+</div>
+<div class="flex p-1 bg-slate-100 rounded-2xl mb-8">
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all bg-brand-navy text-white shadow-md" id="btn-onsite" onclick="const container = document.getElementById('home-address-container'); container.classList.add('hidden', 'opacity-0'); this.classList.add('bg-brand-navy', 'text-white', 'shadow-md'); this.classList.remove('text-brand-navy', 'hover:bg-white/50'); document.getElementById('btn-home').classList.remove('bg-brand-navy', 'text-white', 'shadow-md'); document.getElementById('btn-home').classList.add('text-brand-navy', 'hover:bg-white/50');" type="button">
+                            On-Site Booking
+                        </button>
+<button class="flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all text-brand-navy hover:bg-white/50" id="btn-home" onclick="const container = document.getElementById('home-address-container'); container.classList.remove('hidden'); setTimeout(() =&gt; container.classList.remove('opacity-0'), 10); this.classList.add('bg-brand-navy', 'text-white', 'shadow-md'); this.classList.remove('text-brand-navy', 'hover:bg-white/50'); document.getElementById('btn-onsite').classList.remove('bg-brand-navy', 'text-white', 'shadow-md'); document.getElementById('btn-onsite').classList.add('text-brand-navy', 'hover:bg-white/50');" type="button">
+                            Home Booking
+                        </button>
+</div>
+<form class="space-y-6">
+<div class="grid gap-6 md:grid-cols-2">
+<div class="space-y-2">
+<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Full Name</label>
+<input class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none" placeholder="John Doe" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Contact Number</label>
+<input class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+<div class="space-y-2 col-span-full hidden opacity-0 transition-all duration-300" id="home-address-container">
+<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Home Address</label>
+<input class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none" placeholder="Enter your full address for home service" type="text"/>
+</div>
+</div>
+<div class="grid md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Vehicle Type</label>
+<select class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none"><option>Small Car Sedan Type</option>
+<option>Hatchback Type 5 Seater</option>
+<option>4x4 Wheel Type Car 7 Seater</option>
+<option>Pick Up Small Car</option>
+<option>Pick Up 4x4 Wheel Big Pick Up</option>
+<option>9 Seater Van</option>
+<option>14 Seater Van</option>
+<option>22 Seater Coaster Bus</option>
+<option>32 Seater Coaster Bus</option>
+<option>Recovery Type Vehicle</option>
+<option>3 Ton Pick Up (Without Cabin)</option>
+<option>3 Ton Pick Up (With Cabin)</option>
+<option>7 Ton Pick Up Type</option>
+<option>Big Bus 60 Above Seater</option>
+<option>Trolly Wash</option>
+<option>Bike Wash</option></select>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">SERVICE TYPE</label>
+<select class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none">
+<option>Full Wash</option>
+<option>Body Wash</option>
+<option>Water Wash</option>
+<option>Oil Change Only</option>
+<option>Oil &amp; Filter Change</option>
+<option>Grease Change</option>
+</select>
+</div>
+</div>
+<div class="grid md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Preferred Date</label>
+<input class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none" type="date"/>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-brand-navy uppercase tracking-wider pl-1">Preferred Time</label>
+<select class="w-full px-6 py-4 rounded-xl border-none bg-slate-100 focus:ring-2 focus:ring-brand-aqua transition-all outline-none appearance-none">
+<option value="07:00">07:00 AM</option>
+<option value="08:00">08:00 AM</option>
+<option value="09:00">09:00 AM</option>
+<option value="10:00">10:00 AM</option>
+<option value="11:00">11:00 AM</option>
+<option value="12:00">12:00 PM</option>
+<option value="13:00">01:00 PM</option>
+<option value="14:00">02:00 PM</option>
+<option value="15:00">03:00 PM</option>
+<option value="16:00">04:00 PM</option>
+<option value="17:00">05:00 PM</option>
+<option value="18:00">06:00 PM</option>
+<option value="19:00">07:00 PM</option>
+<option value="20:00">08:00 PM</option>
+<option value="21:00">09:00 PM</option>
+<option value="22:00">10:00 PM</option>
+<option value="23:00">11:00 PM</option>
+</select>
+</div>
+</div>
+<div class="pt-4 pb-2 border-t border-slate-100 mt-4">
+<div class="flex justify-between items-center">
+<span class="text-slate-500 font-bold uppercase tracking-wider text-xs">Estimated Price</span>
+<div class="text-right">
+<span class="text-brand-navy font-headline font-extrabold text-2xl uppercase">Total Cost: </span>
+<span class="text-brand-aqua font-headline font-extrabold text-2xl">AED 21</span>
+</div>
+</div>
+</div>
+<button class="w-full py-5 rounded-full bg-brand-aqua text-brand-navy font-headline font-extrabold text-lg hover:bg-brand-navy hover:text-white transition-all shadow-xl shadow-brand-aqua/20 active:scale-95 mt-4" type="submit">
+                            Confirm Booking
+                        </button>
+</form>
+</div>
+</div>
+</section>
+<!-- Our Gallery Section -->
+<section class="py-24 px-8 bg-[#F0F9FB]" id="gallery">
+<div class="max-w-7xl mx-auto">
+<div class="text-center mb-16 space-y-4">
+<h2 class="text-xs font-bold tracking-[0.3em] uppercase text-brand-aqua">Our Gallery</h2>
+<h3 class="text-4xl md:text-5xl font-headline font-bold text-brand-navy">The Liberty Finish</h3>
+<div class="w-24 h-1.5 bg-brand-aqua mx-auto rounded-full mt-4"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Gallery Item 1 -->
+<div class="group relative overflow-hidden rounded-[2rem] aspect-[4/3] shadow-lg bg-white">
+<img alt="Professional exterior detailing service" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="A Liberty Plus staff member in a professional uniform detailing the rear window of a black sedan." src="assets/images/gallery_deep_foam.jpg"/>
+<div class="absolute inset-0 bg-brand-navy/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+<span class="text-white font-headline font-bold tracking-wider uppercase text-sm">Deep Foam Wash</span>
+</div>
+</div>
+<!-- Gallery Item 2 -->
+<div class="group relative overflow-hidden rounded-[2rem] aspect-[4/3] shadow-lg bg-white">
+<img alt="Professional interior car cleaning" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Two Liberty Plus staff members in uniforms professionally cleaning the interior and trunk area of a dark sedan." src="assets/images/gallery_cleaning.jpg"/>
+<div class="absolute inset-0 bg-brand-navy/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+<span class="text-white font-headline font-bold tracking-wider uppercase text-sm">Professional Cleaning</span>
+</div>
+</div>
+<!-- Gallery Item 3 -->
+<div class="group relative overflow-hidden rounded-[2rem] aspect-[4/3] shadow-lg bg-white">
+<img alt="Professional high-pressure car wash" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Professional staff member power washing a black van at Liberty Plus facility." src="assets/images/gallery_precision_wash.jpg"/>
+<div class="absolute inset-0 bg-brand-navy/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+<span class="text-white font-headline font-bold tracking-wider uppercase text-sm">Precision Wash</span>
+</div>
+</div>
+<!-- Gallery Item 4 -->
+<div class="group relative overflow-hidden rounded-[2rem] aspect-[4/3] shadow-lg bg-white">
+<img alt="Detailed wheel cleaning service" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="External view of Liberty Plus Auto Services facility with cars in the wash bays." src="assets/images/gallery_wheel_detail.jpg"/>
+<div class="absolute inset-0 bg-brand-navy/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+<span class="text-white font-headline font-bold tracking-wider uppercase text-sm">Wheel Detailing</span>
+</div>
+</div>
+<!-- Gallery Item 5 -->
+<div class="group relative overflow-hidden rounded-[2rem] aspect-[4/3] shadow-lg bg-white">
+<img alt="Careful exterior rinsing" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Detailed view of two staff members performing a high-pressure wash on a vehicle." src="assets/images/gallery_exterior_care.jpg"/>
+<div class="absolute inset-0 bg-brand-navy/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+<span class="text-white font-headline font-bold tracking-wider uppercase text-sm">Exterior Care</span>
+</div>
+</div>
+<!-- Gallery Item 6 -->
+<div class="group relative overflow-hidden rounded-[2rem] aspect-[4/3] shadow-lg bg-white">
+<img alt="Liberty Plus Auto Services facility" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Close-up of a staff member cleaning the wheels of a black vehicle with professional care." src="assets/images/gallery_facility.jpg"/>
+<div class="absolute inset-0 bg-brand-navy/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
+<span class="text-white font-headline font-bold tracking-wider uppercase text-sm">Our Facility</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-brand-navy w-full pt-16 pb-8 text-white">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 max-w-7xl mx-auto border-b border-white/10 pb-12 mb-8">
+<div class="mb-8 md:mb-0 text-center md:text-left">
+<div class="text-2xl font-black text-brand-aqua mb-2 uppercase tracking-tighter">Liberty Plus</div>
+<p class="text-slate-400 max-w-xs font-['Manrope'] text-sm tracking-normal">
+<span class="block">51 Al Marmoumiyah 2 St</span>
+<span class="block">Musaffah - M6</span>
+<span class="block">Abu Dhabi, United Arab Emirates</span>
+</p>
+<div class="mt-2">
+<span class="text-slate-400 text-sm">Phone: </span>
+<span class="text-sm">+971 50 578 6115</span>
+</div>
+</div>
+<div class="flex gap-x-16">
+<div class="flex flex-col gap-4">
+<span class="text-brand-aqua font-bold text-xs uppercase tracking-widest">Company</span>
+<a class="text-slate-400 hover:text-white transition-colors font-['Manrope'] text-sm tracking-normal" href="#">Privacy Policy</a>
+<a class="text-slate-400 hover:text-white transition-colors font-['Manrope'] text-sm tracking-normal" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-4">
+<span class="text-brand-aqua font-bold text-xs uppercase tracking-widest">Support</span>
+<a class="text-slate-400 hover:text-white transition-colors font-['Manrope'] text-sm tracking-normal" href="#">Contact Us</a>
+<a class="text-slate-400 hover:text-white transition-colors font-['Manrope'] text-sm tracking-normal" href="#">Careers</a>
+</div>
+</div>
+</div>
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center text-slate-500 font-['Manrope'] text-sm tracking-normal">
+<p>© 2026 <span class="text-slate-400">Liberty Plus Auto Services LLC</span></p>
+<div class="flex gap-6 mt-4 md:mt-0">
+<span class="material-symbols-outlined cursor-pointer text-brand-aqua hover:text-white transition-colors">brand_awareness</span>
+<span class="material-symbols-outlined cursor-pointer text-brand-aqua hover:text-white transition-colors">hub</span>
+<span class="material-symbols-outlined cursor-pointer text-brand-aqua hover:text-white transition-colors">public</span>
+</div>
+</div>
+</footer>
+<script>
+    const slider = document.getElementById('hero-slider');
+    const afterImage = slider.querySelector('.after-image');
+    const handle = slider.querySelector('.slider-handle');
+    const beforeLabel = slider.querySelector('.label-before');
+    const afterLabel = slider.querySelector('.label-after');
+
+    function moveSlider(e) {
+        const rect = slider.getBoundingClientRect();
+        let x = (e.pageX || e.touches[0].pageX) - rect.left;
+        
+        if (x < 0) x = 0;
+        if (x > rect.width) x = rect.width;
+
+        const percent = (x / rect.width) * 100;
+
+        afterImage.style.clipPath = `inset(0 0 0 ${percent}%)`;
+        handle.style.left = `${percent}%`;
+
+        // Optional: Fade labels as handle approaches them
+        beforeLabel.style.opacity = percent < 10 ? '0' : '1';
+        afterLabel.style.opacity = percent > 90 ? '0' : '1';
+    }
+
+    let isDragging = false;
+
+    const startDragging = () => isDragging = true;
+    const stopDragging = () => isDragging = false;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        moveSlider(e);
+    });
+    window.addEventListener('mouseup', stopDragging);
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        moveSlider(e);
+    });
+
+    slider.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        moveSlider(e);
+    });
+    window.addEventListener('touchend', stopDragging);
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        moveSlider(e);
+    });
+</script></body></html>
