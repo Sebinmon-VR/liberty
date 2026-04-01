@@ -22,37 +22,37 @@ CONTAINER_SETTINGS = "settings"
 
 client = CosmosClient(ENDPOINT, KEY)
 
-# Ensure database and containers exist
-try:
-    db = client.create_database_if_not_exists(id=DATABASE_ID)
-    PK_PATH = PartitionKey(path="/_partitionKey")
+# # Ensure database and containers exist
+# try:
+#     db = client.create_database_if_not_exists(id=DATABASE_ID)
+#     PK_PATH = PartitionKey(path="/_partitionKey")
     
-    services_container = db.create_container_if_not_exists(id=CONTAINER_SERVICES, partition_key=PK_PATH)
-    bookings_container = db.create_container_if_not_exists(id=CONTAINER_BOOKINGS, partition_key=PK_PATH)
-    admin_container = db.create_container_if_not_exists(id=CONTAINER_ADMIN, partition_key=PK_PATH)
-    settings_container = db.create_container_if_not_exists(id=CONTAINER_SETTINGS, partition_key=PK_PATH)
+#     services_container = db.create_container_if_not_exists(id=CONTAINER_SERVICES, partition_key=PK_PATH)
+#     bookings_container = db.create_container_if_not_exists(id=CONTAINER_BOOKINGS, partition_key=PK_PATH)
+#     admin_container = db.create_container_if_not_exists(id=CONTAINER_ADMIN, partition_key=PK_PATH)
+#     settings_container = db.create_container_if_not_exists(id=CONTAINER_SETTINGS, partition_key=PK_PATH)
     
-    # Pre-populate default timings if settings container is empty
-    try:
-        query = "SELECT * FROM c WHERE c.id = 'timings'"
-        items = list(settings_container.query_items(query=query, enable_cross_partition_query=True))
-        if not items:
-            default_timings = [
-                "08:00 AM - 09:00 AM", "09:00 AM - 10:00 AM", "10:00 AM - 11:00 AM",
-                "11:00 AM - 12:00 PM", "12:00 PM - 01:00 PM", "01:00 PM - 02:00 PM",
-                "02:00 PM - 03:00 PM", "03:00 PM - 04:00 PM", "04:00 PM - 05:00 PM",
-                "05:00 PM - 06:00 PM", "06:00 PM - 07:00 PM", "07:00 PM - 08:00 PM"
-            ]
-            settings_container.upsert_item({
-                "id": "timings",
-                "slots": default_timings,
-                "_partitionKey": "global"
-            })
-    except Exception as e:
-        print(f"Timing initialization error: {e}")
+#     # Pre-populate default timings if settings container is empty
+#     try:
+#         query = "SELECT * FROM c WHERE c.id = 'timings'"
+#         items = list(settings_container.query_items(query=query, enable_cross_partition_query=True))
+#         if not items:
+#             default_timings = [
+#                 "08:00 AM - 09:00 AM", "09:00 AM - 10:00 AM", "10:00 AM - 11:00 AM",
+#                 "11:00 AM - 12:00 PM", "12:00 PM - 01:00 PM", "01:00 PM - 02:00 PM",
+#                 "02:00 PM - 03:00 PM", "03:00 PM - 04:00 PM", "04:00 PM - 05:00 PM",
+#                 "05:00 PM - 06:00 PM", "06:00 PM - 07:00 PM", "07:00 PM - 08:00 PM"
+#             ]
+#             settings_container.upsert_item({
+#                 "id": "timings",
+#                 "slots": default_timings,
+#                 "_partitionKey": "global"
+#             })
+#     except Exception as e:
+#         print(f"Timing initialization error: {e}")
 
-except exceptions.CosmosHttpResponseError as e:
-    print(f"Cosmos DB Error: {e.message}")
+# except exceptions.CosmosHttpResponseError as e:
+#     print(f"Cosmos DB Error: {e.message}")
 
 @app.route('/')
 def index():

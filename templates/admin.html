@@ -7,8 +7,10 @@
     <title>Intelligent Command Center | Liberty Plus</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}">
 
@@ -181,7 +183,8 @@
                     <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100">
                         <div class="flex justify-between items-center mb-8">
                             <h2 class="text-xl font-black text-navy uppercase">Business Timings</h2>
-                            <button type="button" onclick="addTimingRow()" class="text-aqua font-bold text-[10px] uppercase">+ Add Slot</button>
+                            <button type="button" onclick="addTimingRow()"
+                                class="text-aqua font-bold text-[10px] uppercase">+ Add Slot</button>
                         </div>
                         <form id="timings-form" class="space-y-6">
                             <div id="timing-rows" class="grid grid-cols-2 gap-4 max-h-60 overflow-y-auto no-scrollbar">
@@ -208,7 +211,8 @@
                                 <span class="font-bold text-navy text-sm">{{ admin.username }}</span>
                                 <div class="flex gap-2">
                                     <button onclick='editAdmin(JSON.parse(this.dataset.admin))'
-                                        data-admin='{{ admin|tojson|safe }}' class="text-slate-300 hover:text-navy"><span
+                                        data-admin='{{ admin|tojson|safe }}'
+                                        class="text-slate-300 hover:text-navy"><span
                                             class="material-symbols-outlined text-sm">edit</span></button>
                                     <button onclick="deleteAdmin('{{ admin.id }}')"
                                         class="text-slate-300 hover:text-red-500"><span
@@ -320,38 +324,51 @@
         </div>
 
         <!-- Service Modal -->
-        <div id="service-modal" class="bg-white w-full max-w-2xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+        <div id="service-modal"
+            class="bg-white w-full max-w-2xl rounded-[3rem] p-12 hidden animate-in zoom-in duration-300"
+            onclick="event.stopPropagation()">
             <h3 id="service-modal-title" class="text-2xl font-black text-navy uppercase mb-8">Vehicle Catalog</h3>
             <form id="service-form" class="space-y-6">
                 <input type="hidden" id="service-id">
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-navy uppercase tracking-widest pl-1">Vehicle Type</label>
-                    <input type="text" id="service-vehicle-type" required placeholder="e.g., Luxury Sedan" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                    <input type="text" id="service-vehicle-type" required placeholder="e.g., Luxury Sedan"
+                        class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
-                        <label class="text-[10px] font-black text-navy uppercase tracking-widest pl-1">Services & Prices</label>
-                        <button type="button" onclick="addServiceRow()" class="text-aqua font-bold text-[10px] uppercase tracking-wider">+ Add Row</button>
+                        <label class="text-[10px] font-black text-navy uppercase tracking-widest pl-1">Services &
+                            Prices</label>
+                        <button type="button" onclick="addServiceRow()"
+                            class="text-aqua font-bold text-[10px] uppercase tracking-wider">+ Add Row</button>
                     </div>
                     <div id="service-rows" class="space-y-3 max-h-60 overflow-y-auto no-scrollbar">
                         <!-- Dynamic rows here -->
                     </div>
                 </div>
                 <div class="flex justify-end pt-6">
-                    <button type="submit" class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Update Catalog</button>
+                    <button type="submit"
+                        class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Update
+                        Catalog</button>
                 </div>
             </form>
         </div>
 
         <!-- Admin Modal -->
-        <div id="admin-modal" class="bg-white w-full max-w-md rounded-[3rem] p-12 hidden animate-in zoom-in duration-300" onclick="event.stopPropagation()">
+        <div id="admin-modal"
+            class="bg-white w-full max-w-md rounded-[3rem] p-12 hidden animate-in zoom-in duration-300"
+            onclick="event.stopPropagation()">
             <h3 id="admin-modal-title" class="text-2xl font-black text-navy uppercase mb-8">System Access</h3>
             <form id="admin-form" class="space-y-6">
                 <input type="hidden" id="admin-id">
-                <input type="text" id="admin-username" required placeholder="Username" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
-                <input type="password" id="admin-password" required placeholder="Access Key / Password" class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                <input type="text" id="admin-username" required placeholder="Username"
+                    class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
+                <input type="password" id="admin-password" required placeholder="Access Key / Password"
+                    class="w-full px-6 py-4 rounded-xl bg-slate-50 border-none font-bold text-navy">
                 <div class="flex justify-end pt-6">
-                    <button type="submit" class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Confirm Access</button>
+                    <button type="submit"
+                        class="bg-navy text-white px-10 py-4 rounded-xl font-black uppercase text-[10px] tracking-widest">Confirm
+                        Access</button>
                 </div>
             </form>
         </div>
@@ -624,9 +641,10 @@
             {% for b in bookings %}
             knownBookingIds.add('{{ b.id }}');
             {% endfor %}
-            allBookings = {{ bookings | tojson | safe }};
-            renderTables();
-            setInterval(syncData, 15000);
+            allBookings = {{ bookings | tojson | safe }
+        };
+        renderTables();
+        setInterval(syncData, 15000);
         };
     </script>
 

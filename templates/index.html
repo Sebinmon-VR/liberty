@@ -8,8 +8,11 @@
     <title>Liberty Plus | Premium Automotive Care</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}">
 
 </head>
@@ -257,14 +260,14 @@
                         <button
                             class="flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all bg-brand-navy text-white shadow-md"
                             id="btn-onsite"
-                            onclick="const container = document.getElementById('home-address-container'); container.classList.add('hidden', 'opacity-0'); this.classList.add('bg-brand-navy', 'text-white', 'shadow-md'); this.classList.remove('text-brand-navy', 'hover:bg-white/50'); document.getElementById('btn-home').classList.remove('bg-brand-navy', 'text-white', 'shadow-md'); document.getElementById('btn-home').classList.add('text-brand-navy', 'hover:bg-white/50');"
+                            onclick="var container = document.getElementById('home-address-container'); container.classList.add('hidden', 'opacity-0'); this.classList.add('bg-brand-navy', 'text-white', 'shadow-md'); this.classList.remove('text-brand-navy', 'hover:bg-white/50'); document.getElementById('btn-home').classList.remove('bg-brand-navy', 'text-white', 'shadow-md'); document.getElementById('btn-home').classList.add('text-brand-navy', 'hover:bg-white/50');"
                             type="button">
                             On-Site Booking
                         </button>
                         <button
                             class="flex-1 py-3 px-4 rounded-xl text-sm font-bold transition-all text-brand-navy hover:bg-white/50"
                             id="btn-home"
-                            onclick="const container = document.getElementById('home-address-container'); container.classList.remove('hidden'); setTimeout(() =&gt; container.classList.remove('opacity-0'), 10); this.classList.add('bg-brand-navy', 'text-white', 'shadow-md'); this.classList.remove('text-brand-navy', 'hover:bg-white/50'); document.getElementById('btn-onsite').classList.remove('bg-brand-navy', 'text-white', 'shadow-md'); document.getElementById('btn-onsite').classList.add('text-brand-navy', 'hover:bg-white/50');"
+                            onclick="var container = document.getElementById('home-address-container'); container.classList.remove('hidden'); setTimeout(() => container.classList.remove('opacity-0'), 10); this.classList.add('bg-brand-navy', 'text-white', 'shadow-md'); this.classList.remove('text-brand-navy', 'hover:bg-white/50'); document.getElementById('btn-onsite').classList.remove('bg-brand-navy', 'text-white', 'shadow-md'); document.getElementById('btn-onsite').classList.add('text-brand-navy', 'hover:bg-white/50');"
                             type="button">
                             Home Booking
                         </button>
@@ -448,6 +451,104 @@
                             class="absolute inset-0 bg-brand-navy/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
                             <span class="text-white font-headline font-bold tracking-wider uppercase text-sm">Our
                                 Facility</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Location and Reviews Section -->
+        <section class="pt-24 bg-white" id="location-reviews">
+            <div class="max-w-7xl mx-auto px-8">
+                <div class="text-center mb-12 space-y-4">
+                    <h2 class="text-xs font-bold tracking-[0.3em] uppercase text-brand-aqua">VISIT US</h2>
+                    <h3 class="text-4xl md:text-5xl font-headline font-bold text-brand-navy">Find Us Here</h3>
+                    <div class="w-24 h-1.5 bg-brand-aqua mx-auto rounded-full mt-4"></div>
+                </div>
+            </div>
+
+            <!-- Map Container -->
+            <div class="mb-16 relative" style="width: 90%; margin-left: auto; margin-right: auto; height: 250px;">
+                <iframe
+                    src="https://maps.google.com/maps?q=24.369533,54.5158867&hl=en&z=17&output=embed"
+                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-8 pb-24" style="margin-bottom: 5%;">
+                <!-- Reviews Container -->
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Review 1 -->
+                    <div class="bg-[#F8FDFE] border-2 border-brand-aqua rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-shadow flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-1 text-brand-aqua mb-6">
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            </div>
+                            <p class="text-slate-600 italic leading-relaxed mb-8 text-sm md:text-base">
+                                "Honestly one of the better car washes in the Musaffah area. Brought in my Patrol for a deep diesel wash and they did a solid job, especially under the chassis. Prices are quite reasonable too."
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-navy flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                TM
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brand-navy text-sm md:text-base">Tariq Mahmood</h4>
+                                <p class="text-xs text-slate-400">Local Guide • 3 weeks ago</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review 2 -->
+                    <div class="bg-[#F8FDFE] border-2 border-brand-aqua rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-shadow flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-1 text-brand-aqua mb-6">
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            </div>
+                            <p class="text-slate-600 italic leading-relaxed mb-8 text-sm md:text-base">
+                                "Dropped off my car for an oil change and general checkup. The mechanic was straightforward and didn't try to upsell me on unnecessary stuff, which I appreciate. Good honest garage."
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-navy flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                CV
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brand-navy text-sm md:text-base">Chris V.</h4>
+                                <p class="text-xs text-slate-400">2 reviews • 1 month ago</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review 3 -->
+                    <div class="bg-[#F8FDFE] border-2 border-brand-aqua rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-shadow flex flex-col justify-between">
+                        <div>
+                            <div class="flex gap-1 text-brand-aqua mb-6">
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                                <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+                            </div>
+                            <p class="text-slate-600 italic leading-relaxed mb-8 text-sm md:text-base">
+                                "Very good service for hot wash. They really take their time to clean the rims and inside the doors where dirt gets stuck. The waiting area could be a bit better but overall the cleaning quality is top notch."
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-brand-navy flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                KA
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brand-navy text-sm md:text-base">Khalid Al Muhairi</h4>
+                                <p class="text-xs text-slate-400">Verified Customer • 4 days ago</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -641,6 +742,16 @@
 
         initClientSystem();
     </script>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/971505786115" target="_blank" rel="noopener noreferrer"
+        class="text-white hover:scale-110 transition-transform duration-300 flex items-center justify-center group"
+        style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; background-color: #25D366; width: 64px; height: 64px; border-radius: 50%; box-shadow: 0 10px 25px rgba(37,211,102,0.5);"
+        aria-label="Chat with us on WhatsApp">
+        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+            <path d="M12.031 0C5.385 0 0 5.381 0 12.028c0 2.126.554 4.195 1.605 6.01L.001 24l6.108-1.6c1.758.966 3.738 1.474 5.922 1.474 6.646 0 12.031-5.385 12.031-12.032C24 5.38 18.615 0 12.031 0zm.014 21.84c-1.801 0-3.567-.482-5.113-1.396l-.37-.215-3.804.996.997-3.712-.236-.376A9.975 9.975 0 0 1 2.052 12.04c0-5.503 4.475-9.982 9.988-9.982 5.513 0 9.987 4.479 9.987 9.982 0 5.502-4.474 9.98-9.983 9.98zm5.498-7.531c-.301-.151-1.78-.88-2.057-.98-.277-.101-.481-.151-.682.151-.202.301-.78 1.018-.956 1.22-.176.202-.352.227-.654.076-.302-.151-1.27-.468-2.42-1.49-.894-.795-1.497-1.78-1.674-2.082-.176-.301-.019-.464.132-.614.136-.136.302-.352.453-.527.151-.176.201-.301.302-.502.1-.2.05-.376-.025-.527-.075-.151-.683-1.643-.935-2.25-.246-.593-.497-.512-.682-.52-.176-.007-.377-.007-.578-.007-.201 0-.528.075-.805.376-.277.301-1.056 1.03-1.056 2.513 0 1.482 1.082 2.915 1.233 3.115.151.201 2.124 3.243 5.145 4.545.719.309 1.278.494 1.716.633.721.228 1.378.196 1.896.119.578-.087 1.78-.729 2.03-1.433.25-.704.25-1.308.175-1.434-.076-.126-.277-.202-.579-.353z"/>
+        </svg>
+    </a>
 </body>
 
 </html>
